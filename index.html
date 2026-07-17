@@ -11,8 +11,11 @@
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h1, h2 { text-align: center; color: #333; }
         .role-badge { display: block; text-align: center; font-weight: bold; background: #34495e; color: white; padding: 6px; border-radius: 4px; margin-bottom: 15px; text-transform: uppercase; font-size: 14px; }
+        
+        /* Pengaturan Logo Konsep Poin A */
         .logo-container { text-align: center; margin-bottom: 15px; }
         .logo-img { max-width: 90px; height: auto; border-radius: 50%; object-fit: cover; }
+        
         .stok-box { font-size: 28px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -22,7 +25,7 @@
         .btn-logout { background-color: #e74c3c; margin-top: 15px; }
         .btn-logout:hover { background-color: #c0392b; }
         
-        /* Tombol Aksi Admin */
+        /* Tombol Persetujuan Admin */
         .btn-approve { background-color: #2ecc71; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px; }
         .btn-approve:hover { background-color: #27ae60; }
         .btn-reject { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
@@ -43,9 +46,10 @@
 
     <!-- ================= 1. HALAMAN LOGIN ================= -->
     <div id="loginPage" class="card">
-       <div class="logo-container">
-    <img src="logo.png" alt="Logo" class="logo.png">
-</div>
+        <!-- Ruang Logo Login (Poin A) -->
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo Beras" class="logo-img">
+        </div>
         <h1>🔐 Login Sistem</h1>
         <form id="formLogin">
             <div class="form-group">
@@ -63,9 +67,10 @@
 
     <!-- ================= 2. DASHBOARD UTAMA ================= -->
     <div id="mainPage" class="hidden">
+        <!-- Ruang Logo Beranda (Poin A) -->
         <div class="logo-container">
-    <img src="logo.png" alt="Logo" class="logo.png logo-beranda">
-</div>
+            <img src="logo.png" alt="Logo Beras" class="logo-img">
+        </div>
         <span id="displayRole" class="role-badge">MASUK SEBAGAI: -</span>
 
         <!-- Ringkasan Stok & Grafik Tren (Bisa dilihat Admin & User) -->
@@ -132,10 +137,10 @@
 
     <!-- ================= LOGIKA SISTEM (JAVASCRIPT) ================= -->
     <script>
-        // Informasi Akun Login
+        // Informasi Akun Login Beras
         const KREDENSIAL = {
-            "admin": { pass: "Batom2025", role: "ADMIN" },
-            "rakha": { pass: "user123", role: "USER" }
+            "admin": { pass: "beras123", role: "ADMIN" },
+            "user": { pass: "user123", role: "USER" }
         };
 
         // DOM Elements
@@ -156,7 +161,7 @@
             bukaDashboard(currentRole);
         }
 
-        // Event Login
+        // Event Trigger Login
         document.getElementById('formLogin').addEventListener('submit', function(e) {
             e.preventDefault();
             const userIn = document.getElementById('username').value.trim().toLowerCase();
@@ -174,7 +179,7 @@
             }
         });
 
-        // Tampilkan Antarmuka Berdasarkan Hak Akses
+        // Buka Tampilan Dashboard Sesuai Role Akun
         function bukaDashboard(role) {
             currentRole = role;
             loginPage.classList.add('hidden');
@@ -191,23 +196,23 @@
             updateSistem();
         }
 
-        // Input Admin (Beras Masuk - Langsung Disetujui)
+        // Simpan Beras Masuk (Oleh Admin - Langsung Approve)
         document.getElementById('formAdmin').addEventListener('submit', function(e) {
             e.preventDefault();
             tambahTransaksi('masuk', document.getElementById('jumlahMasuk').value, document.getElementById('ketMasuk').value, 'disetujui');
             document.getElementById('formAdmin').reset();
         });
 
-        // Input User (Beras Keluar - Status Menunggu Persetujuan)
+// Ajukan Beras Keluar (Oleh User - Status Menunggu Persetujuan)
 document.getElementById('formUser').addEventListener('submit', function(e) {
 e.preventDefault();
 tambahTransaksi('keluar', document.getElementById('jumlahKeluar').value, document.getElementById('ketKeluar').value, 'menunggu');
 document.getElementById('formUser').reset();
 });
-// Fungsi Memasukkan Data ke Database Browser
+// Masukkan Transaksi ke Database Browser (LocalStorage)
 function tambahTransaksi(jenis, jumlah, keterangan, status) {
 const jumlahFloat = parseFloat(jumlah);
-// Proteksi Awal untuk User: Cek kecukupan stok sebelum mengajukan
+// Cek Stok untuk User: Cegah pengajuan jika di atas kapasitas sisa stok saat ini
 if (jenis === 'keluar' && status === 'menunggu') {
 let stokSaatIni = 0;
 dataBeras.forEach(item => {
@@ -232,11 +237,11 @@ dataBeras.push(transaksi);
 localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
 updateSistem();
 }
-// Tombol Aksi Admin: Setujui Transaksi Keluar
+// Tombol Aksi Admin: Setujui Transaksi Keluar User
 function setujuiTransaksi(id) {
 const index = dataBeras.findIndex(item => item.id === id);
 if (index !== -1) {
-// Validasi Akhir Admin: Pastikan stok tidak minus saat disetujui saat ini
+// Hitung Ulang Stok Sebelum Disetujui (Cegah Over-allocation)
 let totalStok = 0;
 dataBeras.forEach(item => {
 if (item.status === 'disetujui') {
@@ -252,7 +257,7 @@ localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
 updateSistem();
 }
 }
-// Tombol Aksi Admin: Tolak Transaksi Keluar
+// Tombol Aksi Admin: Tolak Transaksi Keluar User
 function tolakTransaksi(id) {
 const index = dataBeras.findIndex(item => item.id === id);
 if (index !== -1) {
@@ -261,13 +266,13 @@ localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
 updateSistem();
 }
 }
-// Hitung Data, Bangun Grafik & Muat Tabel
+// Hitung Data, Bangun Grafik & Muat Tabel Visual
 function updateSistem() {
 tabelRiwayatEl.innerHTML = '';
 let totalStok = 0;
 let riwayatStokGrafik =;
 let labelTanggalGrafik = ['Mulai'];
-// Iterasi untuk menghitung akumulasi stok akhir & mengisi grafik
+// Iterasi Kalkulasi Stok Riil & Pengisian Node Grafik
 dataBeras.forEach(item => {
 if (item.status === 'disetujui') {
 if (item.jenis === 'masuk') {
@@ -276,12 +281,11 @@ totalStok += item.jumlah;
 totalStok -= item.jumlah;
 }
 riwayatStokGrafik.push(totalStok);
-// Ambil komponen tanggal saja sebelum spasi penanda waktu jam
 labelTanggalGrafik.push(item.tanggal.split(' ')[0]);
 }
 });
 totalStokEl.innerText = ${totalStok.toFixed(1)} Kg;
-// Cetak Baris Tabel Riwayat (Dibalik agar urutan paling baru muncul paling atas)
+// Cetak Baris Tabel Riwayat (Terbalik agar data terbaru berada di atas)
 dataBeras.slice().reverse().forEach(item => {
 let aksiKolon = '';
 if (item.status === 'menunggu') {
@@ -298,9 +302,9 @@ tabelRiwayatEl.innerHTML += row;
 });
 renderGrafik(labelTanggalGrafik, riwayatStokGrafik);
 }
-// Render Grafik Visual Garis Menggunakan Chart.js
+// Gambar Ulang Line Chart Menggunakan Chart.js
 function renderGrafik(labels, data) {
-if (stokChart) stokChart.destroy(); // Hapus instance lama agar grafik tidak bertumpuk
+if (stokChart) stokChart.destroy(); // Hapus instance lama agar grafik tidak kedap-kedip
 const ctx = document.getElementById('stokChart').getContext('2d');
 stokChart = new Chart(ctx, {
 type: 'line',
@@ -328,7 +332,7 @@ ticks: { callback: function(value) { return value + ' Kg'; } }
 }
 });
 }
-// Event Logout
+// Aksi Logout Bersihkan Sesi
 document.getElementById('btnLogout').addEventListener('click', function() {
 sessionStorage.clear();
 mainPage.classList.add('hidden');
