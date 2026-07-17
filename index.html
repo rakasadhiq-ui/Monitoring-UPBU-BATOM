@@ -8,6 +8,12 @@
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h1, h2 { text-align: center; color: #333; }
+        
+        /* Pengaturan Logo */
+        .logo-container { text-align: center; margin-bottom: 15px; }
+        .logo-img { max-width: 100px; height: auto; border-radius: 50%; object-fit: cover; }
+        .logo-beranda { max-width: 80px; }
+
         .stok-box { font-size: 24px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -31,6 +37,10 @@
 
     <!-- ================= 1. HALAMAN LOGIN ================= -->
     <div id="loginPage" class="card">
+        <!-- Logo di Halaman Login -->
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo Beras" class="logo-img">
+        </div>
         <h1>🔐 Login Sistem</h1>
         <form id="formLogin">
             <div class="form-group">
@@ -48,6 +58,10 @@
 
     <!-- ================= 2. HALAMAN UTAMA MONITORING (TERKUNCI) ================= -->
     <div id="mainPage" class="hidden">
+        <!-- Logo di Halaman Beranda -->
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo Beras" class="logo-img logo-beranda">
+        </div>
         <h1>🌾 Monitoring Stok Beras</h1>
 
         <!-- Ringkasan Total Stok -->
@@ -99,12 +113,9 @@
 
     <!-- ================= LOGIKA SISTEM (JAVASCRIPT) ================= -->
     <script>
-        // --- PENGATURAN AKUN LOGIN ---
-        // Ganti username dan password di bawah ini sesuai keinginan Anda
         const USERNAME_BENAR = "admin";
-        const PASSWORD_BENAR = "Batom2025";
+        const PASSWORD_BENAR = "beras123";
 
-        // DOM Elements
         const loginPage = document.getElementById('loginPage');
         const mainPage = document.getElementById('mainPage');
         const formLogin = document.getElementById('formLogin');
@@ -115,22 +126,19 @@
         const totalStokEl = document.getElementById('totalStok');
         const tabelRiwayatEl = document.getElementById('tabelRiwayat');
 
-        // Database internal browser
         let dataBeras = JSON.parse(localStorage.getItem('dataBeras')) || [];
 
-        // --- CEK STATUS LOGIN SAAT HALAMAN DIBUKA ---
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             tampilkanHalamanUtama();
         }
 
-        // --- PROSES LOGIN ---
         formLogin.addEventListener('submit', function(e) {
             e.preventDefault();
             const userIn = document.getElementById('username').value;
             const passIn = document.getElementById('password').value;
 
             if (userIn === USERNAME_BENAR && passIn === PASSWORD_BENAR) {
-                sessionStorage.setItem('isLoggedIn', 'true'); // Menyimpan status login selama tab browser dibuka
+                sessionStorage.setItem('isLoggedIn', 'true');
                 loginError.classList.add('hidden');
                 formLogin.reset();
                 tampilkanHalamanUtama();
@@ -139,21 +147,18 @@
             }
         });
 
-        // --- PROSES LOGOUT ---
         btnLogout.addEventListener('click', function() {
             sessionStorage.removeItem('isLoggedIn');
             mainPage.classList.add('hidden');
             loginPage.classList.remove('hidden');
         });
 
-        // --- FUNGSI MENAMPILKAN HALAMAN UTAMA ---
         function tampilkanHalamanUtama() {
             loginPage.classList.add('hidden');
             mainPage.classList.remove('hidden');
             updateUI();
         }
 
-        // --- PROSES UPDATE UI & HITUNG STOK ---
         function updateUI() {
             tabelRiwayatEl.innerHTML = '';
             let total = 0;
@@ -177,7 +182,6 @@
             totalStokEl.innerText = `${total.toFixed(1)} Kg`;
         }
 
-        // --- PROSES SIMPAN DATA BERAS ---
         formBeras.addEventListener('submit', function(e) {
             e.preventDefault();
 
