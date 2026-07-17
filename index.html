@@ -10,7 +10,7 @@
         body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h1, h2 { text-align: center; color: #333; }
-        .role-badge { display: block; text-align: center; font-weight: bold; background: #e0e0e0; padding: 5px; border-radius: 4px; margin-bottom: 15px; }
+        .role-badge { display: block; text-align: center; font-weight: bold; background: #34495e; color: white; padding: 6px; border-radius: 4px; margin-bottom: 15px; text-transform: uppercase; font-size: 14px; }
         .logo-container { text-align: center; margin-bottom: 15px; }
         .logo-img { max-width: 90px; height: auto; border-radius: 50%; object-fit: cover; }
         .stok-box { font-size: 28px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
@@ -19,19 +19,24 @@
         input, select, button { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
         button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; }
         button:hover { background-color: #2980b9; }
-        .btn-logout { background-color: #e74c3c; margin-top: 10px; }
+        .btn-logout { background-color: #e74c3c; margin-top: 15px; }
         .btn-logout:hover { background-color: #c0392b; }
-        .btn-approve { background-color: #2ecc71; width: auto; padding: 5px 10px; display: inline-block; }
-        .btn-reject { background-color: #e74c3c; width: auto; padding: 5px 10px; display: inline-block; }
+        
+        /* Tombol Aksi Admin */
+        .btn-approve { background-color: #2ecc71; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-approve:hover { background-color: #27ae60; }
+        .btn-reject { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-reject:hover { background-color: #c0392b; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: #f2f2f2; }
         .badge-masuk { color: #2ecc71; font-weight: bold; }
         .badge-keluar { color: #e74c3c; font-weight: bold; }
-        .badge-pending { color: #f39c12; font-style: italic; }
+        .badge-pending { color: #f39c12; font-style: italic; font-weight: bold; }
         .hidden { display: none !important; }
         .error-msg { color: #e74c3c; font-size: 14px; text-align: center; margin-top: 10px; font-weight: bold; }
-        .chart-container { position: relative; margin: auto; height: 250px; width: 100%; }
+        .chart-container { position: relative; margin: 15px auto 0 auto; height: 250px; width: 100%; }
     </style>
 </head>
 <body>
@@ -45,7 +50,7 @@
         <form id="formLogin">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" placeholder="admin atau user" required>
+                <input type="text" id="username" placeholder="Masukkan admin atau user" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
@@ -56,24 +61,23 @@
         </form>
     </div>
 
-    <!-- ================= 2. HALAMAN DASHBOARD UTAMA ================= -->
+    <!-- ================= 2. DASHBOARD UTAMA ================= -->
     <div id="mainPage" class="hidden">
         <div class="logo-container">
             <img src="https://unsplash.com" alt="Logo" class="logo-img">
         </div>
-        <span id="displayRole" class="role-badge">ROLE: -</span>
+        <span id="displayRole" class="role-badge">MASUK SEBAGAI: -</span>
 
-        <!-- Ringkasan Stok & Grafik (Terlihat oleh Admin & User) -->
+        <!-- Ringkasan Stok & Grafik Tren (Bisa dilihat Admin & User) -->
         <div class="card">
-            <h2>Sisa Stok Saat Ini</h2>
+            <h2>Sisa Stok Beras Saat Ini</h2>
             <div class="stok-box" id="totalStok">0 Kg</div>
-            <!-- Wadah Grafik -->
             <div class="chart-container">
                 <canvas id="stokChart"></canvas>
             </div>
         </div>
 
-        <!-- Form Input Admin (Hanya Masuk) -->
+        <!-- FORM INPUT ADMIN (Hanya Masuk) -->
         <div id="formAdminBox" class="card hidden">
             <h2>Input Beras Masuk (Admin Only)</h2>
             <form id="formAdmin">
@@ -89,9 +93,9 @@
             </form>
         </div>
 
-        <!-- Form Input User (Hanya Keluar) -->
+        <!-- FORM INPUT USER (Hanya Ajukan Keluar) -->
         <div id="formUserBox" class="card hidden">
-            <h2>Ajukan Pengajuan Beras Keluar (User)</h2>
+            <h2>Ajukan Pengajuan Beras Keluar (User Only)</h2>
             <form id="formUser">
                 <div class="form-group">
                     <label for="jumlahKeluar">Jumlah Keluar (Kg)</label>
@@ -105,34 +109,36 @@
             </form>
         </div>
 
-        <!-- Tabel Riwayat & Approval -->
+        <!-- TABEL RIWAYAT & VALIDASI (Persetujuan Admin) -->
         <div class="card">
             <h2>Riwayat & Validasi Transaksi</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Jenis</th>
-                        <th>Jumlah</th>
-                        <th>Keterangan</th>
-                        <th>Status / Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelRiwayat"></tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Keterangan</th>
+                            <th>Status / Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelRiwayat"></tbody>
+                </table>
+            </div>
             <button id="btnLogout" class="btn-logout">Keluar (Logout)</button>
         </div>
     </div>
 
-    <!-- ================= LOGIKA JAVASCRIPT ================= -->
+    <!-- ================= LOGIKA SISTEM (JAVASCRIPT) ================= -->
     <script>
-        // Data Login
+        // Informasi Akun Login
         const KREDENSIAL = {
             "admin": { pass: "beras123", role: "ADMIN" },
             "user": { pass: "user123", role: "USER" }
         };
 
-        // DOM
+        // DOM Elements
         const loginPage = document.getElementById('loginPage');
         const mainPage = document.getElementById('mainPage');
         const displayRole = document.getElementById('displayRole');
@@ -145,12 +151,12 @@
         let dataBeras = JSON.parse(localStorage.getItem('dataBerasApproval')) || [];
         let stokChart = null;
 
-        // Cek Sesi Login Aktif
+        // Validasi Sesi Saat Reload Halaman
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
             bukaDashboard(currentRole);
         }
 
-        // Aksi Login
+        // Event Login
         document.getElementById('formLogin').addEventListener('submit', function(e) {
             e.preventDefault();
             const userIn = document.getElementById('username').value.trim().toLowerCase();
@@ -168,7 +174,7 @@
             }
         });
 
-        // Buka Tampilan Dashboard Sesuai Role
+        // Tampilkan Antarmuka Berdasarkan Hak Akses
         function bukaDashboard(role) {
             currentRole = role;
             loginPage.classList.add('hidden');
@@ -185,184 +191,146 @@
             updateSistem();
         }
 
-        // Tambah Data Beras Masuk (Oleh Admin - Otomatis Setuju)
+        // Input Admin (Beras Masuk - Langsung Disetujui)
         document.getElementById('formAdmin').addEventListener('submit', function(e) {
             e.preventDefault();
             tambahTransaksi('masuk', document.getElementById('jumlahMasuk').value, document.getElementById('ketMasuk').value, 'disetujui');
             document.getElementById('formAdmin').reset();
         });
 
-        // Tambah Data Beras Keluar (Oleh User - Status Menunggu Persetujuan)
-        document.getElementById('formUser').addEventListener('submit', function(e) {
-            e.preventDefault();
-            tambahTransaksi('keluar', document.getElementById('jumlahKeluar').value, document.getElementById('ketKeluar').value, 'menunggu');
-            document.getElementById('formUser').reset();
-        });
-
-        function tambahTransaksi(jenis, jumlah, keterangan, status) {
-            const transaksi = {
-                id: Date.now(),
-                        // --- PROSES TAMBAH DATA BERAS (CEK VALIDASI STOK USER) ---
-        function tambahTransaksi(jenis, jumlah, keterangan, status) {
-            const jumlahFloat = parseFloat(jumlah);
-            
-            // Validasi: User tidak boleh mengajukan keluar melebihi sisa stok yang ada saat ini
-            if (jenis === 'keluar' && status === 'menunggu') {
-                let stokSaatIni = 0;
-                dataBeras.forEach(item => {
-                    if (item.status === 'disetujui') {
-                        stokSaatIni += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
-                    }
-                });
-                
-                if (jumlahFloat > stokSaatIni) {
-                    alert(`Gagal! Stok tidak cukup. Sisa stok saat ini hanya ${stokSaatIni.toFixed(1)} Kg.`);
-                    return; // Batalkan proses input
-                }
-            }
-
-            const transaksi = {
-                id: Date.now(),
-                // Format manual agar seragam tanpa masalah koma/spasi dari toLocaleDateString
-                tanggal: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
-                jenis: jenis,
-                jumlah: jumlahFloat,
-                keterangan: keterangan,
-                status: status
-            };
-            dataBeras.push(transaksi);
-            localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
-            updateSistem();
-        }
-
-        // --- ADMIN MENYETUJUI TRANSAKSI KELUAR USER (DENGAN CEK STOK AKHIR) ---
-        function setujuiTransaksi(id) {
-            const index = dataBeras.findIndex(item => item.id === id);
-            if (index !== -1) {
-                // Hitung ulang stok sebelum menyetujui, mengantisipasi stok menipis karena transaksi lain
-                let totalStok = 0;
-                dataBeras.forEach(item => {
-                    if (item.status === 'disetujui') {
-                        totalStok += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
-                    }
-                });
-
-                if (dataBeras[index].jenis === 'keluar' && dataBeras[index].jumlah > totalStok) {
-                    alert(`Gagal menyetujui! Stok saat ini (${totalStok.toFixed(1)} Kg) tidak mencukupi untuk pengeluaran sebesar ${dataBeras[index].jumlah} Kg.`);
-                    return;
-                }
-
-                dataBeras[index].status = 'disetujui';
-                localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
-                updateSistem();
-            }
-        }
-
-        // --- ADMIN MENOLAK TRANSAKSI KELUAR USER ---
-        function tolakTransaksi(id) {
-            const index = dataBeras.findIndex(item => item.id === id);
-            if (index !== -1) {
-                dataBeras[index].status = 'ditolak';
-                localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
-                updateSistem();
-            }
-        }
-
-        // --- KALKULASI SEMUA DATA & UPDATE VISUAL (FIXED GRAPH LOGIC) ---
-        function updateSistem() {
-            tabelRiwayatEl.innerHTML = '';
-            let totalStok = 0;
-            
-            // Penampung data grafik chronological (dari lama ke baru)
-            let riwayatStokGrafik =; // Mulai dari angka nol
-            let labelTanggalGrafik = ['Mulai'];
-
-            // Proses data & hitung stok akhir
-            dataBeras.forEach(item => {
-                if (item.status === 'disetujui') {
-                    if (item.jenis === 'masuk') {
-                        totalStok += item.jumlah;
-                    } else {
-                        totalStok -= item.jumlah;
-                    }
-                    // Grafik HANYA mencatat perubahan jika transaksi disetujui (stok berubah nyata)
-                    riwayatStokGrafik.push(totalStok);
-                    // Ambil komponen tanggal saja sebelum spasi jam
-                    const tglSaja = item.tanggal.split(' ')[0];
-                    labelTanggalGrafik.push(tglSaja);
-                }
-            });
-
-            // Tampilkan total stok di box utama
-            totalStokEl.innerText = `${totalStok.toFixed(1)} Kg`;
-
-            // Render baris tabel (terbalik agar data terbaru berada di atas untuk kenyamanan user)
-            dataBeras.slice().reverse().forEach(item => {
-                let aksiKolon = '';
-                
-                if (item.status === 'menunggu') {
-                    if (currentRole === 'ADMIN') {
-                        aksiKolon = `<button class="btn-approve" onclick="setujuiTransaksi(${item.id})">✔</button> 
-                                     <button class="btn-reject" onclick="tolakTransaksi(${item.id})">❌</button>`;
-                    } else {
-                        aksiKolon = `<span class="badge-pending">Menunggu Admin</span>`;
-                    }
-                } else {
-                    aksiKolon = item.status === 'disetujui' ? '✅ Disetujui' : '🚫 Ditolak';
-                }
-
-                const row = `<tr>
-                    <td>${item.tanggal}</td>
-                    <td class="${item.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar'}">${item.jenis.toUpperCase()}</td>
-                    <td>${item.jumlah} Kg</td>
-                    <td>${item.keterangan}</td>
-                    <td>${aksiKolon}</td>
-                </tr>`;
-                tabelRiwayatEl.innerHTML += row;
-            });
-
-            // Gambar ulang grafik dengan data yang valid
-            renderGrafik(labelTanggalGrafik, riwayatStokGrafik);
-        }
-
-        // --- LOGIKA MENGGAMBAR GRAFIK TREN ---
-        function renderGrafik(labels, data) {
-            if (stokChart) stokChart.destroy(); // Bersihkan instance lama agar tidak terjadi tumpang tindih
-
-            const ctx = document.getElementById('stokChart').getContext('2d');
-            stokChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Tren Sisa Stok Beras (Kg)',
-                        data: data,
-                        borderColor: '#3498db',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.2, // Membuat garis sedikit melengkung halus
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { 
-                        y: { 
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return value + ' Kg'; } // Menambahkan satuan Kg di sumbu Y grafik
-                            }
-                        } 
-                    }
-                }
-            });
-        }
-
-        // --- AKSI LOGOUT ---
-        document.getElementById('btnLogout').addEventListener('click', function() {
-            sessionStorage.clear();
-            mainPage.classList.add('hidden');
-            loginPage.classList.remove('hidden');
-        });
-
+        // Input User (Beras Keluar - Status Menunggu Persetujuan)
+document.getElementById('formUser').addEventListener('submit', function(e) {
+e.preventDefault();
+tambahTransaksi('keluar', document.getElementById('jumlahKeluar').value, document.getElementById('ketKeluar').value, 'menunggu');
+document.getElementById('formUser').reset();
+});
+// Fungsi Memasukkan Data ke Database Browser
+function tambahTransaksi(jenis, jumlah, keterangan, status) {
+const jumlahFloat = parseFloat(jumlah);
+// Proteksi Awal untuk User: Cek kecukupan stok sebelum mengajukan
+if (jenis === 'keluar' && status === 'menunggu') {
+let stokSaatIni = 0;
+dataBeras.forEach(item => {
+if (item.status === 'disetujui') {
+stokSaatIni += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
+}
+});
+if (jumlahFloat > stokSaatIni) {
+alert(Gagal! Pengajuan ditolak sistem karena sisa stok hanya ${stokSaatIni.toFixed(1)} Kg.);
+return;
+}
+}
+const transaksi = {
+id: Date.now(),
+tanggal: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
+jenis: jenis,
+jumlah: jumlahFloat,
+keterangan: keterangan,
+status: status
+};
+dataBeras.push(transaksi);
+localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+updateSistem();
+}
+// Tombol Aksi Admin: Setujui Transaksi Keluar
+function setujuiTransaksi(id) {
+const index = dataBeras.findIndex(item => item.id === id);
+if (index !== -1) {
+// Validasi Akhir Admin: Pastikan stok tidak minus saat disetujui saat ini
+let totalStok = 0;
+dataBeras.forEach(item => {
+if (item.status === 'disetujui') {
+totalStok += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
+}
+});
+if (dataBeras[index].jenis === 'keluar' && dataBeras[index].jumlah > totalStok) {
+alert(Gagal menyetujui! Stok sekarang tinggal ${totalStok.toFixed(1)} Kg, tidak cukup untuk pengeluaran ${dataBeras[index].jumlah} Kg.);
+return;
+}
+dataBeras[index].status = 'disetujui';
+localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+updateSistem();
+}
+}
+// Tombol Aksi Admin: Tolak Transaksi Keluar
+function tolakTransaksi(id) {
+const index = dataBeras.findIndex(item => item.id === id);
+if (index !== -1) {
+dataBeras[index].status = 'ditolak';
+localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+updateSistem();
+}
+}
+// Hitung Data, Bangun Grafik & Muat Tabel
+function updateSistem() {
+tabelRiwayatEl.innerHTML = '';
+let totalStok = 0;
+let riwayatStokGrafik =;
+let labelTanggalGrafik = ['Mulai'];
+// Iterasi untuk menghitung akumulasi stok akhir & mengisi grafik
+dataBeras.forEach(item => {
+if (item.status === 'disetujui') {
+if (item.jenis === 'masuk') {
+totalStok += item.jumlah;
+} else {
+totalStok -= item.jumlah;
+}
+riwayatStokGrafik.push(totalStok);
+// Ambil komponen tanggal saja sebelum spasi penanda waktu jam
+labelTanggalGrafik.push(item.tanggal.split(' ')[0]);
+}
+});
+totalStokEl.innerText = ${totalStok.toFixed(1)} Kg;
+// Cetak Baris Tabel Riwayat (Dibalik agar urutan paling baru muncul paling atas)
+dataBeras.slice().reverse().forEach(item => {
+let aksiKolon = '';
+if (item.status === 'menunggu') {
+if (currentRole === 'ADMIN') {
+aksiKolon = <button class="btn-approve" onclick="setujuiTransaksi(${item.id})">✔</button> <button class="btn-reject" onclick="tolakTransaksi(${item.id})">❌</button>;
+} else {
+aksiKolon = <span class="badge-pending">⏳ Menunggu Admin</span>;
+}
+} else {
+aksiKolon = item.status === 'disetujui' ? '✅ Disetujui' : '🚫 Ditolak';
+}
+const row = <tr> <td>${item.tanggal}</td> <td class="${item.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar'}">${item.jenis.toUpperCase()}</td> <td>${item.jumlah} Kg</td> <td>${item.keterangan}</td> <td>${aksiKolon}</td> </tr>;
+tabelRiwayatEl.innerHTML += row;
+});
+renderGrafik(labelTanggalGrafik, riwayatStokGrafik);
+}
+// Render Grafik Visual Garis Menggunakan Chart.js
+function renderGrafik(labels, data) {
+if (stokChart) stokChart.destroy(); // Hapus instance lama agar grafik tidak bertumpuk
+const ctx = document.getElementById('stokChart').getContext('2d');
+stokChart = new Chart(ctx, {
+type: 'line',
+data: {
+labels: labels,
+datasets: [{
+label: 'Tren Sisa Stok Beras (Kg)',
+data: data,
+borderColor: '#3498db',
+backgroundColor: 'rgba(52, 152, 219, 0.1)',
+borderWidth: 2,
+tension: 0.2,
+fill: true
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+scales: {
+y: {
+beginAtZero: true,
+ticks: { callback: function(value) { return value + ' Kg'; } }
+}
+}
+}
+});
+}
+// Event Logout
+document.getElementById('btnLogout').addEventListener('click', function() {
+sessionStorage.clear();
+mainPage.classList.add('hidden');
+loginPage.classList.remove('hidden');
+});
