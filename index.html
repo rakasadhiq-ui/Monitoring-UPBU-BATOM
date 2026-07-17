@@ -2,10 +2,14 @@
 <html lang="id">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Monitoring Stok Beras</title>
+    <title>Sistem Monitoring Stok Beras | UPBU Kelas III Batom</title>
+
+    <link rel="icon" href="favicon.ico">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,11 +18,19 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    <!-- SweetAlert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- ChartJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -26,255 +38,192 @@
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
-
-        body{
-            background:#eef2f7;
-            font-family:Segoe UI,Arial,sans-serif;
-        }
-
-        .sidebar{
-            position:fixed;
-            left:0;
-            top:0;
-            width:250px;
-            height:100vh;
-            background:#198754;
-            color:white;
-            overflow:auto;
-            transition:.3s;
-        }
-
-        .sidebar img{
-            width:90px;
-            display:block;
-            margin:20px auto 10px;
-        }
-
-        .sidebar h4{
-            text-align:center;
-            margin-bottom:25px;
-            font-weight:bold;
-        }
-
-        .sidebar a{
-            display:block;
-            color:white;
-            padding:14px 25px;
-            text-decoration:none;
-            transition:.2s;
-        }
-
-        .sidebar a:hover{
-            background:rgba(255,255,255,.15);
-        }
-
-        .content{
-            margin-left:250px;
-            padding:20px;
-        }
-
-        .navbar-custom{
-            background:white;
-            border-radius:15px;
-            padding:15px 20px;
-            box-shadow:0 3px 15px rgba(0,0,0,.1);
-            margin-bottom:25px;
-        }
-
-        .stat-card{
-            border:none;
-            border-radius:18px;
-            color:white;
-            transition:.3s;
-            box-shadow:0 5px 18px rgba(0,0,0,.15);
-        }
-
-        .stat-card:hover{
-            transform:translateY(-6px);
-        }
-
-        .bg1{
-            background:#198754;
-        }
-
-        .bg2{
-            background:#0d6efd;
-        }
-
-        .bg3{
-            background:#dc3545;
-        }
-
-        .bg4{
-            background:#ffc107;
-            color:black;
-        }
-
-        .stat-card i{
-            font-size:42px;
-        }
-
-        .card{
-            border:none;
-            border-radius:18px;
-            box-shadow:0 5px 15px rgba(0,0,0,.08);
-        }
-
-        table{
-            font-size:14px;
-        }
-
-        .badge-menunggu{
-            background:#ffc107;
-            color:black;
-        }
-
-        .badge-setuju{
-            background:#198754;
-        }
-
-        .badge-tolak{
-            background:#dc3545;
-        }
-
-        .dark{
-            background:#1f1f1f;
-            color:white;
-        }
-
-        .dark .card{
-            background:#2d2d2d;
-            color:white;
-        }
-
-        .dark .navbar-custom{
-            background:#2d2d2d;
-            color:white;
-        }
-
-        .dark table{
-            color:white;
-        }
-
-        @media(max-width:768px){
-
-            .sidebar{
-                width:70px;
-            }
-
-            .sidebar h4{
-                display:none;
-            }
-
-            .sidebar a span{
-                display:none;
-            }
-
-            .content{
-                margin-left:70px;
-            }
-
-        }
-    </style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<div class="sidebar">
+<!-- ================= PRELOADER ================= -->
 
-    <img src="logo.png">
+<div id="preloader">
 
-    <h4>MONITORING BERAS</h4>
-
-    <a href="#">
-        <i class="fa fa-house"></i>
-        <span> Dashboard</span>
-    </a>
-
-    <a href="#">
-        <i class="fa fa-box"></i>
-        <span> Stok</span>
-    </a>
-
-    <a href="#">
-        <i class="fa fa-chart-line"></i>
-        <span> Statistik</span>
-    </a>
-
-    <a href="#">
-        <i class="fa fa-file-export"></i>
-        <span> Export</span>
-    </a>
-
-    <a href="#" id="btnDark">
-        <i class="fa fa-moon"></i>
-        <span> Dark Mode</span>
-    </a>
-
-    <a href="#" id="btnLogout">
-        <i class="fa fa-right-from-bracket"></i>
-        <span> Logout</span>
-    </a>
+    <div class="loader"></div>
 
 </div>
 
-<div class="content">
+<!-- ================= SIDEBAR ================= -->
 
-<div class="navbar-custom d-flex justify-content-between align-items-center">
+<aside class="sidebar">
 
-<div>
+    <div class="sidebar-header">
 
-<h3>
-<i class="fa fa-warehouse text-success"></i>
-Monitoring Stok Beras
-</h3>
+        <img src="logo.png" class="logo">
 
-<small>
-Sistem Inventaris Gudang
-</small>
+        <h4>UPBU BATOM</h4>
 
-</div>
+        <small>Monitoring Stok Beras</small>
 
-<div>
+    </div>
 
-<span class="badge bg-success p-2">
+    <ul class="menu">
 
-<i class="fa fa-user"></i>
+        <li class="active">
 
-<span id="namaRole">
+            <a href="#">
 
-ADMIN
+                <i class="fa-solid fa-house"></i>
 
-</span>
+                <span>Dashboard</span>
 
-</span>
+            </a>
 
-</div>
+        </li>
 
-</div>
+        <li>
+
+            <a href="#stok">
+
+                <i class="fa-solid fa-box"></i>
+
+                <span>Data Stok</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#grafik">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+                <span>Grafik</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#laporan">
+
+                <i class="fa-solid fa-file-lines"></i>
+
+                <span>Laporan</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#backup">
+
+                <i class="fa-solid fa-database"></i>
+
+                <span>Backup</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#" id="btnDark">
+
+                <i class="fa-solid fa-moon"></i>
+
+                <span>Dark Mode</span>
+
+            </a>
+
+        </li>
+
+        <li>
+
+            <a href="#" id="btnLogout">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>Logout</span>
+
+            </a>
+
+        </li>
+
+    </ul>
+
+</aside>
+
+<!-- ================= CONTENT ================= -->
+
+<div class="main">
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="topbar">
+
+    <button class="btn-menu">
+
+        <i class="fa-solid fa-bars"></i>
+
+    </button>
+
+    <div class="title">
+
+        Sistem Monitoring Stok Beras
+
+    </div>
+
+    <div class="user-info">
+
+        <button class="btn btn-light">
+
+            <i class="fa-solid fa-bell"></i>
+
+        </button>
+
+        <span>
+
+            <i class="fa-solid fa-user"></i>
+
+            <span id="namaUser">
+
+                Administrator
+
+            </span>
+
+        </span>
+
+    </div>
+
+</nav>
+
+<!-- ================= DASHBOARD ================= -->
+
+<section class="dashboard">
 
 <div class="row g-4">
 
-<div class="col-lg-3">
+<div class="col-lg-3 col-md-6">
 
-<div class="card stat-card bg1">
+<div class="card card-total">
 
 <div class="card-body">
 
-<div class="d-flex justify-content-between">
+<div class="icon">
+
+<i class="fa-solid fa-box"></i>
+
+</div>
 
 <div>
 
-<h6>Total Stok</h6>
+<p>Total Stok</p>
 
-<h2 id="stokTotal">
+<h2 id="totalStok">
 
 0 Kg
 
@@ -282,29 +231,29 @@ ADMIN
 
 </div>
 
-<i class="fa fa-sack-dollar"></i>
-
 </div>
 
 </div>
 
 </div>
 
-</div>
+<div class="col-lg-3 col-md-6">
 
-<div class="col-lg-3">
-
-<div class="card stat-card bg2">
+<div class="card card-masuk">
 
 <div class="card-body">
 
-<div class="d-flex justify-content-between">
+<div class="icon">
+
+<i class="fa-solid fa-arrow-down"></i>
+
+</div>
 
 <div>
 
-<h6>Total Masuk</h6>
+<p>Beras Masuk</p>
 
-<h2 id="stokMasuk">
+<h2 id="totalMasuk">
 
 0 Kg
 
@@ -312,29 +261,29 @@ ADMIN
 
 </div>
 
-<i class="fa fa-arrow-down"></i>
-
 </div>
 
 </div>
 
 </div>
 
-</div>
+<div class="col-lg-3 col-md-6">
 
-<div class="col-lg-3">
-
-<div class="card stat-card bg3">
+<div class="card card-keluar">
 
 <div class="card-body">
 
-<div class="d-flex justify-content-between">
+<div class="icon">
+
+<i class="fa-solid fa-arrow-up"></i>
+
+</div>
 
 <div>
 
-<h6>Total Keluar</h6>
+<p>Beras Keluar</p>
 
-<h2 id="stokKeluar">
+<h2 id="totalKeluar">
 
 0 Kg
 
@@ -342,37 +291,33 @@ ADMIN
 
 </div>
 
-<i class="fa fa-arrow-up"></i>
-
 </div>
 
 </div>
 
 </div>
 
-</div>
+<div class="col-lg-3 col-md-6">
 
-<div class="col-lg-3">
-
-<div class="card stat-card bg4">
+<div class="card card-pending">
 
 <div class="card-body">
 
-<div class="d-flex justify-content-between">
+<div class="icon">
+
+<i class="fa-solid fa-clock"></i>
+
+</div>
 
 <div>
 
-<h6>Menunggu</h6>
+<p>Pending</p>
 
-<h2 id="stokPending">
+<h2 id="totalPending">
 
 0
 
 </h2>
-
-</div>
-
-<i class="fa fa-clock"></i>
 
 </div>
 
@@ -392,7 +337,7 @@ ADMIN
 
 <div class="card">
 
-<div class="card-header bg-success text-white">
+<div class="card-header">
 
 Grafik Stok Beras
 
@@ -400,7 +345,7 @@ Grafik Stok Beras
 
 <div class="card-body">
 
-<canvas id="chartStok" height="120"></canvas>
+<canvas id="barChart"></canvas>
 
 </div>
 
@@ -412,7 +357,7 @@ Grafik Stok Beras
 
 <div class="card">
 
-<div class="card-header bg-primary text-white">
+<div class="card-header">
 
 Komposisi Stok
 
@@ -430,95 +375,49 @@ Komposisi Stok
 
 </div>
 
-<br><!-- ================= LOGIN ================= -->
+<br><!-- ================= MENU AKSI ================= -->
 
-<div class="modal fade" id="loginModal" data-bs-backdrop="static">
+<div class="card shadow-sm border-0 mb-4">
 
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="card-body">
 
-        <div class="modal-content">
+        <div class="row g-3 align-items-center">
 
-            <div class="modal-header bg-success text-white">
-
-                <h5>
-                    <i class="fa fa-lock"></i>
-                    Login Sistem
-                </h5>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="text-center mb-3">
-
-                    <img src="logo.png" width="100">
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label>Username</label>
-
-                    <input type="text"
-                        class="form-control"
-                        id="username">
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label>Password</label>
-
-                    <div class="input-group">
-
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password">
-
-                        <button
-                            class="btn btn-outline-secondary"
-                            id="showPassword">
-
-                            <i class="fa fa-eye"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
+            <div class="col-lg-3">
 
                 <button
-                    class="btn btn-success w-100"
-                    id="btnLogin">
+                    class="btn btn-primary w-100"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalMasuk">
 
-                    <i class="fa fa-right-to-bracket"></i>
+                    <i class="fa-solid fa-plus"></i>
 
-                    Login
+                    Tambah Beras Masuk
 
                 </button>
 
             </div>
 
-        </div>
+            <div class="col-lg-3">
 
-    </div>
+                <button
+                    class="btn btn-danger w-100"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalKeluar">
 
-</div>
+                    <i class="fa-solid fa-paper-plane"></i>
 
-<!-- ================= TOOLBAR ================= -->
+                    Pengajuan Keluar
 
-<div class="card mb-4">
+                </button>
 
-    <div class="card-body">
+            </div>
 
-        <div class="row g-3">
-
-            <div class="col-lg-4">
+            <div class="col-lg-3">
 
                 <input
                     type="text"
-                    id="searchData"
+                    id="searchInput"
                     class="form-control"
                     placeholder="Cari transaksi...">
 
@@ -531,30 +430,165 @@ Komposisi Stok
                     class="form-select">
 
                     <option value="">Semua Status</option>
-                    <option>Disetujui</option>
-                    <option>Menunggu</option>
-                    <option>Ditolak</option>
+
+                    <option value="Disetujui">Disetujui</option>
+
+                    <option value="Menunggu">Menunggu</option>
+
+                    <option value="Ditolak">Ditolak</option>
 
                 </select>
 
             </div>
 
-            <div class="col-lg-3">
+        </div>
 
-                <input
-                    type="date"
-                    id="filterTanggal"
-                    class="form-control">
+    </div>
+
+</div>
+
+<!-- ================= TABEL ================= -->
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+
+            <i class="fa-solid fa-table"></i>
+
+            Riwayat Transaksi
+
+        </h5>
+
+        <div>
+
+            <button class="btn btn-success btn-sm" id="btnExcel">
+
+                <i class="fa-solid fa-file-excel"></i>
+
+                Excel
+
+            </button>
+
+            <button class="btn btn-danger btn-sm" id="btnPDF">
+
+                <i class="fa-solid fa-file-pdf"></i>
+
+                PDF
+
+            </button>
+
+            <button class="btn btn-secondary btn-sm" id="btnPrint">
+
+                <i class="fa-solid fa-print"></i>
+
+                Print
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-light">
+
+                <tr>
+
+                    <th>No</th>
+
+                    <th>Tanggal</th>
+
+                    <th>Jenis</th>
+
+                    <th>Jumlah</th>
+
+                    <th>Keterangan</th>
+
+                    <th>Status</th>
+
+                    <th>Aksi</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tableBody">
+
+                <!-- Data dari JavaScript -->
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- ================= MODAL BERAS MASUK ================= -->
+
+<div
+    class="modal fade"
+    id="modalMasuk">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5>
+
+                    Tambah Beras Masuk
+
+                </h5>
 
             </div>
 
-            <div class="col-lg-2">
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label>Jumlah (Kg)</label>
+
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="masukJumlah">
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label>Keterangan</label>
+
+                    <textarea
+                        class="form-control"
+                        id="masukKeterangan"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
 
                 <button
-                    class="btn btn-success w-100"
-                    id="btnRefresh">
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
 
-                    Refresh
+                    Batal
+
+                </button>
+
+                <button
+                    class="btn btn-primary"
+                    id="btnSimpanMasuk">
+
+                    Simpan
 
                 </button>
 
@@ -566,142 +600,198 @@ Komposisi Stok
 
 </div>
 
-<!-- ================= MENU ================= -->
+<!-- ================= MODAL BERAS KELUAR ================= -->
 
-<div class="card mb-4">
+<div
+    class="modal fade"
+    id="modalKeluar">
 
-<div class="card-body">
+    <div class="modal-dialog">
 
-<div class="row g-2">
+        <div class="modal-content">
 
-<div class="col-lg-2">
+            <div class="modal-header bg-danger text-white">
 
-<button
-class="btn btn-success w-100"
-data-bs-toggle="modal"
-data-bs-target="#modalMasuk">
+                <h5>
 
-<i class="fa fa-plus"></i>
+                    Pengajuan Beras Keluar
 
-Stok Masuk
+                </h5>
 
-</button>
+            </div>
 
-</div>
+            <div class="modal-body">
 
-<div class="col-lg-2">
+                <div class="mb-3">
 
-<button
-class="btn btn-danger w-100"
-data-bs-toggle="modal"
-data-bs-target="#modalKeluar">
+                    <label>Jumlah (Kg)</label>
 
-<i class="fa fa-minus"></i>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="keluarJumlah">
 
-Pengajuan
+                </div>
 
-</button>
+                <div class="mb-3">
 
-</div>
+                    <label>Keterangan</label>
 
-<div class="col-lg-2">
+                    <textarea
+                        class="form-control"
+                        id="keluarKeterangan"></textarea>
 
-<button
-class="btn btn-primary w-100"
-id="btnExportExcel">
+                </div>
 
-Excel
+            </div>
 
-</button>
+            <div class="modal-footer">
 
-</div>
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
 
-<div class="col-lg-2">
+                    Batal
 
-<button
-class="btn btn-danger w-100"
-id="btnExportPDF">
+                </button>
 
-PDF
+                <button
+                    class="btn btn-danger"
+                    id="btnSimpanKeluar">
 
-</button>
+                    Ajukan
 
-</div>
+                </button>
 
-<div class="col-lg-2">
+            </div>
 
-<button
-class="btn btn-secondary w-100"
-onclick="window.print()">
+        </div>
 
-Print
-
-</button>
+    </div>
 
 </div>
 
-<div class="col-lg-2">
+<!-- ================= FOOTER ================= -->
 
-<button
-class="btn btn-warning w-100"
-id="btnBackup">
+<footer class="footer">
 
-Backup
+    <p>
 
-</button>
+        © 2026 Sistem Monitoring Stok Beras
 
-</div>
+        <strong>
 
-</div>
+            UPBU Kelas III Batom
 
-</div>
+        </strong>
 
-</div>
+    </p>
 
-<!-- ================= MODAL STOK MASUK ================= -->
+</footer>
+
+</section>
+
+</div><!-- ================= LOGIN MODAL ================= -->
 
 <div class="modal fade"
-id="modalMasuk">
+     id="loginModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
 
-<div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
 
-<div class="modal-content">
+        <div class="modal-content shadow-lg border-0">
 
-<div class="modal-header bg-success text-white">
+            <div class="modal-body p-5">
 
-<h5>Input Beras Masuk</h5>
+                <div class="text-center mb-4">
+
+                    <img src="logo.png"
+                         width="90"
+                         class="mb-3">
+
+                    <h3 class="fw-bold">
+
+                        Monitoring Stok Beras
+
+                    </h3>
+
+                    <p class="text-muted">
+
+                        UPBU Kelas III Batom
+
+                    </p>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        Username
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        class="form-control">
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Password
+
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-control">
+
+                </div>
+
+                <button
+                    class="btn btn-primary w-100"
+                    id="btnLogin">
+
+                    LOGIN
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="modal-body">
+<!-- ================= TOAST ================= -->
 
-<div class="mb-3">
+<div
+class="position-fixed top-0 end-0 p-3"
+style="z-index:9999">
 
-<label>Jumlah (Kg)</label>
+<div
+id="liveToast"
+class="toast align-items-center text-bg-success border-0">
 
-<input
-type="number"
-id="jumlahMasuk"
-class="form-control">
+<div class="d-flex">
 
-</div>
+<div class="toast-body">
 
-<div class="mb-3">
-
-<label>Keterangan</label>
-
-<input
-type="text"
-id="ketMasuk"
-class="form-control">
+Berhasil
 
 </div>
 
 <button
-class="btn btn-success w-100"
-id="simpanMasuk">
-
-Simpan
+type="button"
+class="btn-close btn-close-white me-2 m-auto"
+data-bs-dismiss="toast">
 
 </button>
 
@@ -711,230 +801,1723 @@ Simpan
 
 </div>
 
-</div>
+<!-- ================= LOADING ================= -->
 
-<!-- ================= MODAL PENGAJUAN ================= -->
+<div id="loadingScreen">
 
-<div class="modal fade"
-id="modalKeluar">
-
-<div class="modal-dialog">
-
-<div class="modal-content">
-
-<div class="modal-header bg-danger text-white">
-
-<h5>Pengajuan Beras Keluar</h5>
+<div class="spinner-border text-primary">
 
 </div>
 
-<div class="modal-body">
+</div>
 
-<div class="mb-3">
-
-<label>Jumlah (Kg)</label>
+<!-- ================= RESTORE JSON ================= -->
 
 <input
-type="number"
-id="jumlahKeluar"
-class="form-control">
+type="file"
+id="restoreFile"
+accept=".json"
+hidden>
 
-</div>
-
-<div class="mb-3">
-
-<label>Keterangan</label>
-
-<input
-type="text"
-id="ketKeluar"
-class="form-control">
-
-</div>
-
-<button
-class="btn btn-danger w-100"
-id="simpanKeluar">
-
-Ajukan
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- ================= TABEL ================= -->
-
-<div class="card">
-
-<div class="card-header bg-dark text-white d-flex justify-content-between">
-
-<span>
-
-Riwayat Transaksi
-
-</span>
-
-<span id="jumlahData">
-
-0 Data
-
-</span>
-
-</div>
-
-<div class="card-body table-responsive">
-
-<table
-class="table table-striped table-hover align-middle">
-
-<thead class="table-success">
-
-<tr>
-
-<th>No</th>
-
-<th>Tanggal</th>
-
-<th>Jenis</th>
-
-<th>Jumlah</th>
-
-<th>Keterangan</th>
-
-<th>Status</th>
-
-<th>Aksi</th>
-
-</tr>
-
-</thead>
-
-<tbody id="tabelData">
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<br><!-- ================= SCRIPT ================= -->
+<!-- ================= SCRIPT ================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
+<script src="app.js"></script>
 
-const ADMIN={
-    username:"admin",
-    password:"beras123"
-};
+</body>
 
-const USER={
-    username:"user",
-    password:"user123"
-};
+</html>
+/* ==========================================================
+   SISTEM MONITORING STOK BERAS
+   UPBU KELAS III BATOM
+   STYLE.CSS
+========================================================== */
 
-let role=localStorage.getItem("role") || "";
-let transaksi=JSON.parse(localStorage.getItem("transaksi")) || [];
+:root{
 
-const loginModal=new bootstrap.Modal(document.getElementById("loginModal"));
+    --primary:#2563eb;
+    --navy:#1e293b;
+    --navy-dark:#0f172a;
+    --hover:#334155;
+    --bg:#f1f5f9;
+    --white:#ffffff;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
+    --text:#1f2937;
+    --border:#e2e8f0;
 
-if(!localStorage.getItem("login")){
-    loginModal.show();
+    --shadow:0 8px 25px rgba(0,0,0,.08);
+
 }
 
-if(localStorage.getItem("darkMode")=="true"){
-    document.body.classList.add("dark");
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
 }
 
-document.getElementById("btnDark").onclick=function(e){
+body{
 
-    e.preventDefault();
+    font-family:'Poppins',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
 
-    document.body.classList.toggle("dark");
+}
 
-    localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark")
-    );
+/* ==========================
+PRELOADER
+========================== */
 
-};
+#preloader{
 
-document.getElementById("showPassword").onclick=function(){
+    position:fixed;
+    inset:0;
+    background:#fff;
+    z-index:99999;
 
-    let pass=document.getElementById("password");
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-    if(pass.type==="password"){
-        pass.type="text";
-        this.innerHTML='<i class="fa fa-eye-slash"></i>';
-    }else{
-        pass.type="password";
-        this.innerHTML='<i class="fa fa-eye"></i>';
+}
+
+.loader{
+
+    width:70px;
+    height:70px;
+
+    border-radius:50%;
+
+    border:7px solid #ddd;
+    border-top:7px solid var(--primary);
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    to{
+
+        transform:rotate(360deg);
+
     }
 
+}
+
+/* ==========================
+SIDEBAR
+========================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:260px;
+    height:100vh;
+
+    background:var(--navy);
+
+    color:#fff;
+
+    transition:.35s;
+
+    z-index:999;
+
+    box-shadow:var(--shadow);
+
+}
+
+.sidebar-header{
+
+    text-align:center;
+
+    padding:30px 15px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.logo{
+
+    width:90px;
+    margin-bottom:15px;
+
+}
+
+.sidebar-header h4{
+
+    font-size:20px;
+    font-weight:600;
+
+}
+
+.sidebar-header small{
+
+    opacity:.7;
+
+}
+
+.menu{
+
+    list-style:none;
+
+    margin-top:20px;
+
+    padding:0;
+
+}
+
+.menu li{
+
+    margin:5px 15px;
+
+}
+
+.menu li a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    color:#fff;
+
+    text-decoration:none;
+
+    padding:14px 18px;
+
+    border-radius:12px;
+
+    transition:.3s;
+
+}
+
+.menu li a i{
+
+    width:22px;
+    text-align:center;
+
+}
+
+.menu li a:hover{
+
+    background:var(--hover);
+
+}
+
+.menu li.active a{
+
+    background:var(--primary);
+
+}
+
+/* ==========================
+CONTENT
+========================== */
+
+.main{
+
+    margin-left:260px;
+
+    padding:25px;
+
+}
+
+/* ==========================
+TOPBAR
+========================== */
+
+.topbar{
+
+    background:#fff;
+
+    border-radius:15px;
+
+    padding:15px 25px;
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.title{
+
+    font-size:22px;
+
+    font-weight:600;
+
+}
+
+.user-info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.user-info span{
+
+    font-weight:500;
+
+}
+
+/* ==========================
+BUTTON MENU
+========================== */
+
+.btn-menu{
+
+    display:none;
+
+    border:none;
+
+    background:none;
+
+    font-size:22px;
+
+}
+
+/* ==========================
+CARD
+========================== */
+
+.card{
+
+    border:none;
+
+    border-radius:18px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.card-header{
+
+    background:#fff;
+
+    font-weight:600;
+
+    border:none;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.card-body{
+
+    padding:25px;
+
+}
+
+/* ==========================
+CARD DASHBOARD
+========================== */
+
+.card-total{
+
+    border-left:5px solid var(--primary);
+
+}
+
+.card-masuk{
+
+    border-left:5px solid var(--success);
+
+}
+
+.card-keluar{
+
+    border-left:5px solid var(--danger);
+
+}
+
+.card-pending{
+
+    border-left:5px solid var(--warning);
+
+}
+
+.card-total .card-body,
+.card-masuk .card-body,
+.card-keluar .card-body,
+.card-pending .card-body{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.icon{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:#fff;
+
+    font-size:25px;
+
+}
+
+.card-total .icon{
+
+    background:var(--primary);
+
+}
+
+.card-masuk .icon{
+
+    background:var(--success);
+
+}
+
+.card-keluar .icon{
+
+    background:var(--danger);
+
+}
+
+.card-pending .icon{
+
+    background:var(--warning);
+
+}
+
+.card h2{
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+.card p{
+
+    margin-bottom:8px;
+
+    color:#64748b;
+
+}/* ==========================================================
+   TABEL
+========================================================== */
+
+.table{
+
+    margin-bottom:0;
+
+    background:#fff;
+
+}
+
+.table thead{
+
+    background:#f8fafc;
+
+}
+
+.table thead th{
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#475569;
+
+    border-bottom:2px solid var(--border);
+
+    white-space:nowrap;
+
+}
+
+.table tbody tr{
+
+    transition:.25s;
+
+}
+
+.table tbody tr:hover{
+
+    background:#f8fbff;
+
+    transform:scale(1.002);
+
+}
+
+.table td{
+
+    vertical-align:middle;
+
+    font-size:14px;
+
+}
+
+/* ==========================
+BADGE STATUS
+========================== */
+
+.badge{
+
+    padding:8px 12px;
+
+    font-size:12px;
+
+    border-radius:30px;
+
+    font-weight:600;
+
+}
+
+.badge-success{
+
+    background:#dcfce7;
+
+    color:#166534;
+
+}
+
+.badge-warning{
+
+    background:#fef3c7;
+
+    color:#92400e;
+
+}
+
+.badge-danger{
+
+    background:#fee2e2;
+
+    color:#991b1b;
+
+}
+
+/* ==========================
+BUTTON
+========================== */
+
+.btn{
+
+    border-radius:10px;
+
+    transition:.25s;
+
+    font-weight:500;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-primary{
+
+    background:var(--primary);
+
+    border:none;
+
+}
+
+.btn-success{
+
+    border:none;
+
+}
+
+.btn-danger{
+
+    border:none;
+
+}
+
+.btn-secondary{
+
+    border:none;
+
+}
+
+/* ==========================
+FORM
+========================== */
+
+.form-control,
+.form-select{
+
+    border-radius:10px;
+
+    border:1px solid var(--border);
+
+    padding:10px 15px;
+
+}
+
+.form-control:focus,
+.form-select:focus{
+
+    box-shadow:none;
+
+    border-color:var(--primary);
+
+}
+
+/* ==========================
+MODAL
+========================== */
+
+.modal-content{
+
+    border:none;
+
+    border-radius:18px;
+
+}
+
+.modal-header{
+
+    border:none;
+
+}
+
+.modal-footer{
+
+    border:none;
+
+}
+
+/* ==========================
+FOOTER
+========================== */
+
+.footer{
+
+    margin-top:30px;
+
+    padding:20px;
+
+    text-align:center;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+/* ==========================
+LOADING SCREEN
+========================== */
+
+#loadingScreen{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(255,255,255,.9);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+/* ==========================
+TOAST
+========================== */
+
+.toast{
+
+    border-radius:12px;
+
+    box-shadow:var(--shadow);
+
+}
+
+/* ==========================
+SEARCH
+========================== */
+
+#searchInput{
+
+    border-radius:30px;
+
+}
+
+/* ==========================
+SCROLLBAR
+========================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+    height:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#e2e8f0;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#94a3b8;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#64748b;
+
+}
+
+/* ==========================
+HOVER EFFECT
+========================== */
+
+.card{
+
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+}/* ==========================================================
+   CHART
+========================================================== */
+
+canvas{
+
+    width:100% !important;
+
+    max-height:350px;
+
+}
+
+/* ==========================================================
+LOGIN MODAL
+========================================================== */
+
+#loginModal .modal-content{
+
+    border-radius:20px;
+
+}
+
+#loginModal img{
+
+    width:90px;
+
+}
+
+#loginModal h3{
+
+    font-weight:700;
+
+    color:var(--navy);
+
+}
+
+#loginModal .form-control{
+
+    height:48px;
+
+}
+
+/* ==========================================================
+DARK MODE
+========================================================== */
+
+body.dark{
+
+    background:#0f172a;
+
+    color:#e2e8f0;
+
+}
+
+body.dark .topbar{
+
+    background:#1e293b;
+
+    color:#fff;
+
+}
+
+body.dark .card{
+
+    background:#1e293b;
+
+    color:#fff;
+
+}
+
+body.dark .card-header{
+
+    background:#1e293b;
+
+    color:#fff;
+
+    border-bottom:1px solid #334155;
+
+}
+
+body.dark .table{
+
+    color:#fff;
+
+    background:#1e293b;
+
+}
+
+body.dark .table thead{
+
+    background:#334155;
+
+}
+
+body.dark .table td,
+body.dark .table th{
+
+    border-color:#334155;
+
+}
+
+body.dark .form-control,
+body.dark .form-select{
+
+    background:#334155;
+
+    color:#fff;
+
+    border-color:#475569;
+
+}
+
+body.dark .form-control::placeholder{
+
+    color:#cbd5e1;
+
+}
+
+body.dark .modal-content{
+
+    background:#1e293b;
+
+    color:#fff;
+
+}
+
+body.dark .footer{
+
+    color:#cbd5e1;
+
+}
+
+/* ==========================================================
+SIDEBAR COLLAPSE
+========================================================== */
+
+.sidebar.close{
+
+    width:80px;
+
+}
+
+.sidebar.close .sidebar-header h4,
+
+.sidebar.close .sidebar-header small,
+
+.sidebar.close .menu span{
+
+    display:none;
+
+}
+
+.sidebar.close + .main{
+
+    margin-left:80px;
+
+}
+
+/* ==========================================================
+NOTIFICATION
+========================================================== */
+
+.notification{
+
+    position:relative;
+
+}
+
+.notification::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    background:red;
+
+    right:-2px;
+
+    top:-2px;
+
+}
+
+/* ==========================================================
+EMPTY DATA
+========================================================== */
+
+.empty-state{
+
+    text-align:center;
+
+    padding:50px;
+
+    color:#94a3b8;
+
+}
+
+.empty-state i{
+
+    font-size:70px;
+
+    margin-bottom:20px;
+
+}
+
+/* ==========================================================
+ANIMATION
+========================================================== */
+
+.fade-up{
+
+    animation:fadeUp .5s ease;
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.zoom{
+
+    animation:zoom .3s;
+
+}
+
+@keyframes zoom{
+
+    from{
+
+        transform:scale(.95);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
+/* ==========================================================
+PRINT
+========================================================== */
+
+@media print{
+
+.sidebar,
+.topbar,
+.btn,
+.footer,
+#searchInput,
+#filterStatus{
+
+    display:none !important;
+
+}
+
+.main{
+
+    margin:0;
+
+    padding:0;
+
+}
+
+.card{
+
+    box-shadow:none;
+
+}
+
+}
+
+/* ==========================================================
+RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+.sidebar{
+
+    left:-260px;
+
+}
+
+.sidebar.show{
+
+    left:0;
+
+}
+
+.main{
+
+    margin-left:0;
+
+}
+
+.btn-menu{
+
+    display:block;
+
+}
+
+.topbar{
+
+    padding:15px;
+
+}
+
+.title{
+
+    font-size:18px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.card-body{
+
+    padding:18px;
+
+}
+
+.card h2{
+
+    font-size:22px;
+
+}
+
+.icon{
+
+    width:55px;
+
+    height:55px;
+
+    font-size:22px;
+
+}
+
+.user-info span{
+
+    display:none;
+
+}
+
+.table{
+
+    font-size:13px;
+
+}
+
+}
+
+@media(max-width:576px){
+
+.sidebar{
+
+    width:240px;
+
+}
+
+.card{
+
+    margin-bottom:15px;
+
+}
+
+.topbar{
+
+    border-radius:12px;
+
+}
+
+.logo{
+
+    width:70px;
+
+}
+
+}
+
+/* ==========================================================
+UTILITY
+========================================================== */
+
+.shadow-soft{
+
+    box-shadow:var(--shadow);
+
+}
+
+.rounded-xl{
+
+    border-radius:18px;
+
+}
+
+.text-navy{
+
+    color:var(--navy);
+
+}
+
+.bg-navy{
+
+    background:var(--navy);
+
+    color:#fff;
+
+}
+
+.cursor{
+
+    cursor:pointer;
+
+}
+
+.transition{
+
+    transition:.3s;
+
+}/* ==========================================================
+   SISTEM MONITORING STOK BERAS
+   UPBU KELAS III BATOM
+   app.js
+========================================================== */
+
+/* ==========================
+LOCAL STORAGE KEY
+========================== */
+
+const STORAGE_KEY = "UPBU_BATOM_STOK";
+
+/* ==========================
+LOGIN
+========================== */
+
+const ACCOUNT = {
+    admin: {
+        username: "admin",
+        password: "admin123",
+        role: "ADMIN"
+    },
+    user: {
+        username: "user",
+        password: "user123",
+        role: "USER"
+    }
 };
 
-document.getElementById("btnLogin").onclick=function(){
+let currentUser = null;
 
-    const u=document.getElementById("username").value.trim();
-    const p=document.getElementById("password").value.trim();
+/* ==========================
+DATA
+========================== */
 
-    if(u===ADMIN.username && p===ADMIN.password){
+let transaksi = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-        role="ADMIN";
+/* ==========================
+CHART
+========================== */
 
-    }else if(u===USER.username && p===USER.password){
+let barChart = null;
+let pieChart = null;
 
-        role="USER";
+/* ==========================
+ELEMENT
+========================== */
 
-    }else{
+const tableBody = document.getElementById("tableBody");
+
+const totalStok = document.getElementById("totalStok");
+const totalMasuk = document.getElementById("totalMasuk");
+const totalKeluar = document.getElementById("totalKeluar");
+const totalPending = document.getElementById("totalPending");
+
+/* ==========================
+INIT
+========================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    hideLoading();
+
+    showLogin();
+
+    renderDashboard();
+
+    renderTable();
+
+    renderChart();
+
+});
+
+/* ==========================
+LOGIN
+========================== */
+
+function showLogin(){
+
+    const modal =
+        new bootstrap.Modal(
+            document.getElementById("loginModal")
+        );
+
+    modal.show();
+
+}
+
+document
+.getElementById("btnLogin")
+.addEventListener("click", login);
+
+function login(){
+
+    const username =
+        document
+        .getElementById("username")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("password")
+        .value
+        .trim();
+
+    if(
+        username===ACCOUNT.admin.username &&
+        password===ACCOUNT.admin.password
+    ){
+
+        currentUser = ACCOUNT.admin;
+
+    }
+
+    else if(
+
+        username===ACCOUNT.user.username &&
+        password===ACCOUNT.user.password
+
+    ){
+
+        currentUser = ACCOUNT.user;
+
+    }
+
+    else{
 
         Swal.fire({
+
             icon:"error",
+
             title:"Login Gagal",
+
             text:"Username atau Password salah"
+
         });
 
         return;
 
     }
 
-    localStorage.setItem("login","true");
-    localStorage.setItem("role",role);
+    document
+    .getElementById("namaUser")
+    .innerHTML=currentUser.role;
 
-    document.getElementById("namaRole").innerHTML=role;
+    bootstrap
+    .Modal
+    .getInstance(
+        document.getElementById("loginModal")
+    )
+    .hide();
 
-    loginModal.hide();
+    toast("Login berhasil");
 
-    Swal.fire({
-        icon:"success",
-        title:"Berhasil Login",
-        timer:1200,
-        showConfirmButton:false
+}
+
+/* ==========================
+SAVE
+========================== */
+
+function saveData(){
+
+    localStorage.setItem(
+
+        STORAGE_KEY,
+
+        JSON.stringify(transaksi)
+
+    );
+
+}
+
+/* ==========================
+FORMAT DATE
+========================== */
+
+function today(){
+
+    return new Date().toLocaleDateString("id-ID",{
+
+        day:"2-digit",
+
+        month:"2-digit",
+
+        year:"numeric"
+
     });
 
-    refreshDashboard();
+}
 
-};
+/* ==========================
+AUTO ID
+========================== */
 
-document.getElementById("btnLogout").onclick=function(e){
+function generateID(){
 
-    e.preventDefault();
+    return Date.now() +
+    Math.floor(Math.random()*1000);
+
+}
+
+/* ==========================
+COUNT
+========================== */
+
+function getTotalMasuk(){
+
+    return transaksi
+
+    .filter(x=>
+
+        x.jenis==="Masuk"
+
+        &&
+
+        x.status==="Disetujui"
+
+    )
+
+    .reduce(
+
+        (a,b)=>a+Number(b.jumlah),
+
+        0
+
+    );
+
+}
+
+function getTotalKeluar(){
+
+    return transaksi
+
+    .filter(x=>
+
+        x.jenis==="Keluar"
+
+        &&
+
+        x.status==="Disetujui"
+
+    )
+
+    .reduce(
+
+        (a,b)=>a+Number(b.jumlah),
+
+        0
+
+    );
+
+}
+
+function getPending(){
+
+    return transaksi
+
+    .filter(x=>
+
+        x.status==="Menunggu"
+
+    )
+
+    .length;
+
+}
+
+function getStock(){
+
+    return getTotalMasuk()-
+    getTotalKeluar();
+
+}
+
+/* ==========================
+DASHBOARD
+========================== */
+
+function renderDashboard(){
+
+    totalMasuk.innerHTML =
+        getTotalMasuk()+" Kg";
+
+    totalKeluar.innerHTML =
+        getTotalKeluar()+" Kg";
+
+    totalStok.innerHTML =
+        getStock()+" Kg";
+
+    totalPending.innerHTML =
+        getPending();
+
+}/* ==========================================================
+CRUD BERAS MASUK
+========================================================== */
+
+document
+.getElementById("btnSimpanMasuk")
+.addEventListener("click", tambahMasuk);
+
+function tambahMasuk(){
+
+    if(currentUser.role!=="ADMIN"){
+
+        Swal.fire({
+
+            icon:"warning",
+
+            title:"Akses Ditolak",
+
+            text:"Hanya ADMIN yang dapat menambah stok."
+
+        });
+
+        return;
+
+    }
+
+    const jumlah = Number(
+        document.getElementById("masukJumlah").value
+    );
+
+    const ket =
+        document
+        .getElementById("masukKeterangan")
+        .value
+        .trim();
+
+    if(jumlah<=0 || ket===""){
+
+        Swal.fire({
+
+            icon:"warning",
+
+            title:"Data belum lengkap"
+
+        });
+
+        return;
+
+    }
+
+    transaksi.push({
+
+        id:generateID(),
+
+        tanggal:today(),
+
+        jenis:"Masuk",
+
+        jumlah,
+
+        keterangan:ket,
+
+        status:"Disetujui"
+
+    });
+
+    saveData();
+
+    renderDashboard();
+
+    renderTable();
+
+    renderChart();
+
+    bootstrap.Modal.getInstance(
+        document.getElementById("modalMasuk")
+    ).hide();
+
+    document.getElementById("masukJumlah").value="";
+    document.getElementById("masukKeterangan").value="";
+
+    toast("Data berhasil ditambahkan");
+
+}
+
+/* ==========================================================
+PENGAJUAN BERAS KELUAR
+========================================================== */
+
+document
+.getElementById("btnSimpanKeluar")
+.addEventListener("click", tambahKeluar);
+
+function tambahKeluar(){
+
+    const jumlah = Number(
+        document.getElementById("keluarJumlah").value
+    );
+
+    const ket =
+        document
+        .getElementById("keluarKeterangan")
+        .value
+        .trim();
+
+    if(jumlah<=0 || ket===""){
+
+        Swal.fire({
+
+            icon:"warning",
+
+            title:"Data belum lengkap"
+
+        });
+
+        return;
+
+    }
+
+    if(jumlah>getStock()){
+
+        Swal.fire({
+
+            icon:"error",
+
+            title:"Stok tidak mencukupi"
+
+        });
+
+        return;
+
+    }
+
+    transaksi.push({
+
+        id:generateID(),
+
+        tanggal:today(),
+
+        jenis:"Keluar",
+
+        jumlah,
+
+        keterangan:ket,
+
+        status:"Menunggu"
+
+    });
+
+    saveData();
+
+    renderDashboard();
+
+    renderTable();
+
+    renderChart();
+
+    bootstrap.Modal.getInstance(
+        document.getElementById("modalKeluar")
+    ).hide();
+
+    document.getElementById("keluarJumlah").value="";
+    document.getElementById("keluarKeterangan").value="";
+
+    toast("Pengajuan berhasil dikirim");
+
+}
+
+/* ==========================================================
+APPROVE
+========================================================== */
+
+function approve(id){
+
+    if(currentUser.role!=="ADMIN") return;
+
+    const item =
+        transaksi.find(x=>x.id===id);
+
+    if(!item) return;
+
+    if(item.jenis==="Keluar" &&
+       item.jumlah>getStock()){
+
+        Swal.fire({
+
+            icon:"error",
+
+            title:"Stok tidak cukup"
+
+        });
+
+        return;
+
+    }
+
+    item.status="Disetujui";
+
+    saveData();
+
+    renderDashboard();
+
+    renderTable();
+
+    renderChart();
+
+    toast("Pengajuan disetujui");
+
+}
+
+/* ==========================================================
+REJECT
+========================================================== */
+
+function reject(id){
+
+    if(currentUser.role!=="ADMIN") return;
+
+    const item =
+        transaksi.find(x=>x.id===id);
+
+    if(!item) return;
+
+    item.status="Ditolak";
+
+    saveData();
+
+    renderDashboard();
+
+    renderTable();
+
+    renderChart();
+
+    toast("Pengajuan ditolak");
+
+}
+
+/* ==========================================================
+HAPUS
+========================================================== */
+
+function hapus(id){
 
     Swal.fire({
 
-        title:"Logout ?",
+        title:"Hapus data?",
 
-        text:"Keluar dari aplikasi",
-
-        icon:"question",
+        icon:"warning",
 
         showCancelButton:true,
 
@@ -942,632 +2525,599 @@ document.getElementById("btnLogout").onclick=function(e){
 
         cancelButtonText:"Batal"
 
-    }).then((r)=>{
+    }).then(result=>{
 
-        if(r.isConfirmed){
+        if(!result.isConfirmed) return;
 
-            localStorage.removeItem("login");
-            localStorage.removeItem("role");
+        transaksi =
+            transaksi.filter(x=>x.id!==id);
 
-            location.reload();
+        saveData();
 
-        }
+        renderDashboard();
 
-    });
+        renderTable();
 
-};
+        renderChart();
 
-function simpanData(){
-
-    localStorage.setItem(
-        "transaksi",
-        JSON.stringify(transaksi)
-    );
-
-}
-
-function formatTanggal(){
-
-    return new Date().toLocaleString("id-ID");
-
-}
-
-function refreshDashboard(){
-
-    let masuk=0;
-    let keluar=0;
-    let pending=0;
-
-    transaksi.forEach(item=>{
-
-        if(item.status==="Disetujui"){
-
-            if(item.jenis==="Masuk"){
-
-                masuk+=Number(item.jumlah);
-
-            }else{
-
-                keluar+=Number(item.jumlah);
-
-            }
-
-        }
-
-        if(item.status==="Menunggu"){
-
-            pending++;
-
-        }
+        toast("Data berhasil dihapus");
 
     });
 
-    document.getElementById("stokMasuk").innerHTML=masuk+" Kg";
-
-    document.getElementById("stokKeluar").innerHTML=keluar+" Kg";
-
-    document.getElementById("stokPending").innerHTML=pending;
-
-    document.getElementById("stokTotal").innerHTML=(masuk-keluar)+" Kg";
-
-}
-
-refreshDashboard();
-
-</script>/* ===========================
-   CRUD TRANSAKSI
-=========================== */
-
-function generateID() {
-    return Date.now() + Math.floor(Math.random() * 1000);
-}
-
-function hitungStok() {
-
-    let stok = 0;
-
-    transaksi.forEach(item => {
-
-        if (item.status === "Disetujui") {
-
-            if (item.jenis === "Masuk") {
-                stok += Number(item.jumlah);
-            } else {
-                stok -= Number(item.jumlah);
-            }
-
-        }
-
-    });
-
-    return stok;
-
-}
-
-/* ===========================
-   INPUT BERAS MASUK
-=========================== */
-
-document.getElementById("simpanMasuk").onclick = function () {
-
-    if (role !== "ADMIN") {
-
-        Swal.fire({
-            icon: "warning",
-            title: "Akses Ditolak",
-            text: "Hanya ADMIN yang dapat menambah stok."
-        });
-
-        return;
-    }
-
-    const jumlah = Number(document.getElementById("jumlahMasuk").value);
-    const ket = document.getElementById("ketMasuk").value.trim();
-
-    if (jumlah <= 0 || ket === "") {
-
-        Swal.fire({
-            icon: "warning",
-            title: "Data belum lengkap"
-        });
-
-        return;
-    }
-
-    transaksi.push({
-
-        id: generateID(),
-        tanggal: formatTanggal(),
-        jenis: "Masuk",
-        jumlah: jumlah,
-        keterangan: ket,
-        status: "Disetujui"
-
-    });
-
-    simpanData();
-    refreshDashboard();
-    renderTable();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("modalMasuk")
-    ).hide();
-
-    document.getElementById("jumlahMasuk").value = "";
-    document.getElementById("ketMasuk").value = "";
-
-    Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Stok berhasil ditambahkan."
-    });
-
-};
-
-/* ===========================
-   PENGAJUAN BERAS KELUAR
-=========================== */
-
-document.getElementById("simpanKeluar").onclick = function () {
-
-    const jumlah = Number(document.getElementById("jumlahKeluar").value);
-    const ket = document.getElementById("ketKeluar").value.trim();
-
-    if (jumlah <= 0 || ket === "") {
-
-        Swal.fire({
-            icon: "warning",
-            title: "Data belum lengkap"
-        });
-
-        return;
-    }
-
-    if (jumlah > hitungStok()) {
-
-        Swal.fire({
-            icon: "error",
-            title: "Stok tidak mencukupi"
-        });
-
-        return;
-    }
-
-    transaksi.push({
-
-        id: generateID(),
-        tanggal: formatTanggal(),
-        jenis: "Keluar",
-        jumlah: jumlah,
-        keterangan: ket,
-        status: "Menunggu"
-
-    });
-
-    simpanData();
-    refreshDashboard();
-    renderTable();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("modalKeluar")
-    ).hide();
-
-    document.getElementById("jumlahKeluar").value = "";
-    document.getElementById("ketKeluar").value = "";
-
-    Swal.fire({
-        icon: "success",
-        title: "Pengajuan berhasil dikirim"
-    });
-
-};
-
-/* ===========================
-   APPROVE
-=========================== */
-
-function approve(id) {
-
-    let item = transaksi.find(x => x.id == id);
-
-    if (!item) return;
-
-    if (item.jumlah > hitungStok()) {
-
-        Swal.fire({
-            icon: "error",
-            title: "Stok tidak cukup"
-        });
-
-        return;
-
-    }
-
-    item.status = "Disetujui";
-
-    simpanData();
-
-    refreshDashboard();
-
-    renderTable();
-
-}
-
-/* ===========================
-   REJECT
-=========================== */
-
-function reject(id) {
-
-    let item = transaksi.find(x => x.id == id);
-
-    if (!item) return;
-
-    item.status = "Ditolak";
-
-    simpanData();
-
-    refreshDashboard();
-
-    renderTable();
-
-}
-
-/* ===========================
-   HAPUS
-=========================== */
-
-function hapus(id){
-
-Swal.fire({
-
-title:"Hapus data?",
-
-icon:"warning",
-
-showCancelButton:true,
-
-confirmButtonText:"Ya"
-
-}).then((r)=>{
-
-if(!r.isConfirmed) return;
-
-transaksi = transaksi.filter(x=>x.id!=id);
-
-simpanData();
-
-refreshDashboard();
-
-renderTable();
-
-});
-
-}
-
-/* ===========================
+}/* ==========================================================
    RENDER TABLE
-=========================== */
+========================================================== */
 
-function renderTable(){
+function renderTable() {
 
-const tbody=document.getElementById("tabelData");
+    tableBody.innerHTML = "";
 
-tbody.innerHTML="";
+    if (transaksi.length === 0) {
 
-document.getElementById("jumlahData").innerHTML=
-transaksi.length+" Data";
+        const tr = document.createElement("tr");
 
-transaksi
-.slice()
-.reverse()
-.forEach((item,index)=>{
+        const td = document.createElement("td");
 
-let badge="";
+        td.colSpan = 7;
 
-if(item.status=="Disetujui")
-badge='<span class="badge bg-success">Disetujui</span>';
+        td.className = "text-center text-muted py-4";
 
-if(item.status=="Menunggu")
-badge='<span class="badge bg-warning text-dark">Menunggu</span>';
-
-if(item.status=="Ditolak")
-badge='<span class="badge bg-danger">Ditolak</span>';
-
-let aksi="";
-
-if(role=="ADMIN"){
-
-    if(item.status=="Menunggu"){
-
-        aksi += `
-        <button class="btn btn-success btn-sm"
-        onclick="approve(${item.id})">
-        <i class="fa fa-check"></i>
-        </button>
+        td.innerHTML = `
+            <i class="fa-solid fa-box-open fa-2x mb-2"></i>
+            <br>
+            Belum ada data transaksi
         `;
 
-        aksi += `
-        <button class="btn btn-warning btn-sm"
-        onclick="reject(${item.id})">
-        <i class="fa fa-xmark"></i>
-        </button>
-        `;
+        tr.appendChild(td);
 
+        tableBody.appendChild(tr);
+
+        return;
     }
 
-    aksi += `
-    <button class="btn btn-danger btn-sm"
-    onclick="hapus(${item.id})">
-    <i class="fa fa-trash"></i>
-    </button>
-    `;
+    transaksi
+        .slice()
+        .reverse()
+        .forEach((item, index) => {
+
+            const tr = document.createElement("tr");
+
+            // Nomor
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.tanggal}</td>
+                <td>${item.jenis}</td>
+                <td>${item.jumlah} Kg</td>
+                <td>${item.keterangan}</td>
+            `;
+
+            /* ================= STATUS ================= */
+
+            const tdStatus = document.createElement("td");
+
+            const badge = document.createElement("span");
+
+            if (item.status === "Disetujui") {
+
+                badge.className = "badge badge-success";
+
+            } else if (item.status === "Menunggu") {
+
+                badge.className = "badge badge-warning";
+
+            } else {
+
+                badge.className = "badge badge-danger";
+
+            }
+
+            badge.innerText = item.status;
+
+            tdStatus.appendChild(badge);
+
+            tr.appendChild(tdStatus);
+
+            /* ================= AKSI ================= */
+
+            const tdAksi = document.createElement("td");
+
+            if (currentUser && currentUser.role === "ADMIN") {
+
+                if (item.status === "Menunggu") {
+
+                    const approveBtn = document.createElement("button");
+
+                    approveBtn.className =
+                        "btn btn-success btn-sm me-1";
+
+                    approveBtn.innerHTML =
+                        '<i class="fa fa-check"></i>';
+
+                    approveBtn.onclick = () => approve(item.id);
+
+                    tdAksi.appendChild(approveBtn);
+
+                    const rejectBtn = document.createElement("button");
+
+                    rejectBtn.className =
+                        "btn btn-warning btn-sm me-1";
+
+                    rejectBtn.innerHTML =
+                        '<i class="fa fa-times"></i>';
+
+                    rejectBtn.onclick = () => reject(item.id);
+
+                    tdAksi.appendChild(rejectBtn);
+
+                }
+
+                const deleteBtn = document.createElement("button");
+
+                deleteBtn.className =
+                    "btn btn-danger btn-sm";
+
+                deleteBtn.innerHTML =
+                    '<i class="fa fa-trash"></i>';
+
+                deleteBtn.onclick = () => hapus(item.id);
+
+                tdAksi.appendChild(deleteBtn);
+
+            } else {
+
+                tdAksi.innerHTML = "-";
+
+            }
+
+            tr.appendChild(tdAksi);
+
+            tableBody.appendChild(tr);
+
+        });
 
 }
 
-tbody.innerHTML += `
+/* ==========================================================
+SEARCH
+========================================================== */
 
-<tr>
+document
+.getElementById("searchInput")
+.addEventListener("keyup", function () {
 
-<td>${index+1}</td>
+    const keyword = this.value.toLowerCase();
 
-<td>${item.tanggal}</td>
+    const rows = tableBody.querySelectorAll("tr");
 
-<td>${item.jenis}</td>
+    rows.forEach(row => {
 
-<td>${item.jumlah} Kg</td>
+        row.style.display =
+            row.innerText.toLowerCase().includes(keyword)
+                ? ""
+                : "none";
 
-<td>${item.keterangan}</td>
-
-<td>${badge}</td>
-
-<td>${aksi}</td>
-
-</tr>
-
-`;
+    });
 
 });
 
-}
+/* ==========================================================
+FILTER STATUS
+========================================================== */
 
-renderTable();/* ===========================
-   GRAFIK
-=========================== */
+document
+.getElementById("filterStatus")
+.addEventListener("change", function () {
 
-let lineChart = null;
-let pieChart = null;
+    const value = this.value;
 
-function renderChart(){
+    const rows = tableBody.querySelectorAll("tr");
 
-    const ctx1 = document.getElementById("chartStok");
+    rows.forEach(row => {
 
-    if(ctx1){
+        if (value === "") {
 
-        if(lineChart) lineChart.destroy();
+            row.style.display = "";
 
-        let masuk = 0;
-        let keluar = 0;
+        } else {
 
-        transaksi.forEach(item=>{
+            row.style.display =
+                row.innerText.includes(value)
+                    ? ""
+                    : "none";
 
-            if(item.status==="Disetujui"){
+        }
 
-                if(item.jenis==="Masuk"){
-                    masuk += Number(item.jumlah);
-                }else{
-                    keluar += Number(item.jumlah);
+    });
+
+});/* ==========================================================
+   CHART.JS
+========================================================== */
+
+function renderChart() {
+
+    const masuk = getTotalMasuk();
+    const keluar = getTotalKeluar();
+
+    /* ================= BAR ================= */
+
+    const barCanvas = document.getElementById("barChart");
+
+    if (barCanvas) {
+
+        if (barChart) barChart.destroy();
+
+        barChart = new Chart(barCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: ["Masuk", "Keluar"],
+
+                datasets: [{
+
+                    label: "Kilogram",
+
+                    data: [masuk, keluar],
+
+                    backgroundColor: [
+
+                        "#16a34a",
+
+                        "#dc2626"
+
+                    ],
+
+                    borderRadius: 8
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
                 }
 
             }
 
         });
 
-        lineChart = new Chart(ctx1,{
-            type:"bar",
-            data:{
-                labels:["Masuk","Keluar"],
-                datasets:[{
-                    label:"Kg",
-                    data:[masuk,keluar]
-                }]
-            }
-        });
-
     }
 
-    const ctx2=document.getElementById("pieChart");
+    /* ================= PIE ================= */
 
-    if(ctx2){
+    const pieCanvas = document.getElementById("pieChart");
 
-        if(pieChart) pieChart.destroy();
+    if (pieCanvas) {
 
-        pieChart=new Chart(ctx2,{
-            type:"pie",
-            data:{
-                labels:["Masuk","Keluar"],
-                datasets:[{
-                    data:[
-                        transaksi.filter(x=>x.jenis==="Masuk").length,
-                        transaksi.filter(x=>x.jenis==="Keluar").length
+        if (pieChart) pieChart.destroy();
+
+        pieChart = new Chart(pieCanvas, {
+
+            type: "pie",
+
+            data: {
+
+                labels: [
+
+                    "Masuk",
+
+                    "Keluar"
+
+                ],
+
+                datasets: [{
+
+                    data: [
+
+                        masuk,
+
+                        keluar
+
+                    ],
+
+                    backgroundColor: [
+
+                        "#16a34a",
+
+                        "#dc2626"
+
                     ]
+
                 }]
+
             }
+
         });
 
     }
 
 }
 
-/* ===========================
-   SEARCH
-=========================== */
+/* ==========================================================
+DARK MODE
+========================================================== */
 
-document.getElementById("searchData")
-.addEventListener("keyup",function(){
+const btnDark =
+document.getElementById("btnDark");
 
-let keyword=this.value.toLowerCase();
+btnDark.onclick = function () {
 
-const rows=document.querySelectorAll("#tabelData tr");
+    document.body.classList.toggle("dark");
 
-rows.forEach(r=>{
+    localStorage.setItem(
 
-r.style.display=
-r.innerText.toLowerCase().includes(keyword)
-?"":"none";
+        "dark",
 
-});
+        document.body.classList.contains("dark")
 
-});
-
-/* ===========================
-   FILTER TANGGAL
-=========================== */
-
-document.getElementById("filterTanggal")
-.addEventListener("change",function(){
-
-let t=this.value;
-
-const rows=document.querySelectorAll("#tabelData tr");
-
-rows.forEach(r=>{
-
-r.style.display=
-r.innerText.includes(t)?"":"none";
-
-});
-
-});
-
-/* ===========================
-   FILTER STATUS
-=========================== */
-
-document.getElementById("filterStatus")
-.addEventListener("change",function(){
-
-let s=this.value;
-
-const rows=document.querySelectorAll("#tabelData tr");
-
-rows.forEach(r=>{
-
-if(s===""){
-r.style.display="";
-}else{
-r.style.display=
-r.innerText.includes(s)?"":"none";
-}
-
-});
-
-});
-
-/* ===========================
-   REFRESH
-=========================== */
-
-document.getElementById("btnRefresh")
-.onclick=function(){
-
-renderTable();
-refreshDashboard();
-renderChart();
+    );
 
 };
 
-/* ===========================
-   EXPORT EXCEL
-=========================== */
+if(localStorage.getItem("dark")=="true"){
 
-document.getElementById("btnExportExcel")
-.onclick=function(){
-
-const ws=XLSX.utils.json_to_sheet(transaksi);
-
-const wb=XLSX.utils.book_new();
-
-XLSX.utils.book_append_sheet(wb,ws,"Transaksi");
-
-XLSX.writeFile(wb,"Laporan_Beras.xlsx");
-
-};
-
-/* ===========================
-   EXPORT PDF
-=========================== */
-
-document.getElementById("btnExportPDF")
-.onclick=function(){
-
-window.print();
-
-};
-
-/* ===========================
-   BACKUP JSON
-=========================== */
-
-document.getElementById("btnBackup")
-.onclick=function(){
-
-const blob=new Blob(
-[
-JSON.stringify(transaksi,null,2)
-],
-{
-type:"application/json"
-});
-
-const a=document.createElement("a");
-
-a.href=URL.createObjectURL(blob);
-
-a.download="backup_beras.json";
-
-a.click();
-
-};
-
-/* ===========================
-   RESTORE JSON
-=========================== */
-
-function restoreJSON(file){
-
-const reader=new FileReader();
-
-reader.onload=function(e){
-
-transaksi=JSON.parse(e.target.result);
-
-simpanData();
-
-refreshDashboard();
-
-renderTable();
-
-renderChart();
-
-};
-
-reader.readAsText(file);
+    document.body.classList.add("dark");
 
 }
 
-/* ===========================
-   INISIALISASI
-=========================== */
+/* ==========================================================
+EXPORT EXCEL
+========================================================== */
 
-refreshDashboard();
+document
+.getElementById("btnExcel")
+.onclick = function(){
+
+    const ws =
+    XLSX.utils.json_to_sheet(transaksi);
+
+    const wb =
+    XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+
+        wb,
+
+        ws,
+
+        "Transaksi"
+
+    );
+
+    XLSX.writeFile(
+
+        wb,
+
+        "Laporan_Stok_Beras.xlsx"
+
+    );
+
+};
+
+/* ==========================================================
+PRINT / PDF
+========================================================== */
+
+document
+.getElementById("btnPrint")
+.onclick = function(){
+
+    window.print();
+
+};
+
+document
+.getElementById("btnPDF")
+.onclick = function(){
+
+    window.print();
+
+};
+
+/* ==========================================================
+BACKUP JSON
+========================================================== */
+
+function backupData(){
+
+    const blob = new Blob(
+
+        [
+
+            JSON.stringify(
+
+                transaksi,
+
+                null,
+
+                2
+
+            )
+
+        ],
+
+        {
+
+            type:"application/json"
+
+        }
+
+    );
+
+    const a =
+    document.createElement("a");
+
+    a.href =
+    URL.createObjectURL(blob);
+
+    a.download =
+    "backup_stok_beras.json";
+
+    a.click();
+
+}
+
+/* ==========================================================
+RESTORE JSON
+========================================================== */
+
+document
+.getElementById("restoreFile")
+.addEventListener(
+
+"change",
+
+function(){
+
+    const file=this.files[0];
+
+    if(!file) return;
+
+    const reader=new FileReader();
+
+    reader.onload=function(e){
+
+        transaksi=
+
+        JSON.parse(
+
+            e.target.result
+
+        );
+
+        saveData();
+
+        renderDashboard();
+
+        renderTable();
+
+        renderChart();
+
+        toast(
+
+            "Restore berhasil"
+
+        );
+
+    };
+
+    reader.readAsText(file);
+
+});
+
+/* ==========================================================
+TOAST
+========================================================== */
+
+function toast(text){
+
+    const toastBody=
+
+    document.querySelector(
+
+        ".toast-body"
+
+    );
+
+    toastBody.innerHTML=text;
+
+    const toast=
+
+    new bootstrap.Toast(
+
+        document.getElementById(
+
+            "liveToast"
+
+        )
+
+    );
+
+    toast.show();
+
+}
+
+/* ==========================================================
+LOADING
+========================================================== */
+
+function hideLoading(){
+
+    setTimeout(()=>{
+
+        document
+        .getElementById(
+            "loadingScreen"
+        )
+        .style.display="none";
+
+    },700);
+
+}
+
+/* ==========================================================
+LOGOUT
+========================================================== */
+
+document
+.getElementById("btnLogout")
+.onclick=function(){
+
+Swal.fire({
+
+title:"Logout?",
+
+icon:"question",
+
+showCancelButton:true
+
+}).then(r=>{
+
+if(!r.isConfirmed) return;
+
+location.reload();
+
+});
+
+};
+
+/* ==========================================================
+SIDEBAR MOBILE
+========================================================== */
+
+const sidebar=document.querySelector(".sidebar");
+
+const menu=document.querySelector(".btn-menu");
+
+menu.onclick=function(){
+
+sidebar.classList.toggle("show");
+
+};
+
+/* ==========================================================
+INIT
+========================================================== */
+
+renderDashboard();
 
 renderTable();
 
 renderChart();
 
-</script>
+console.log(
 
-</body>
+"Monitoring Stok Beras v2.0 Ready"
 
-</html>
+);
