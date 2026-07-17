@@ -4,17 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Monitoring Beras</title>
+    <!-- Library Grafik Chart.js -->
+    <script src="https://jsdelivr.net"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h1, h2 { text-align: center; color: #333; }
-        
-        /* Pengaturan Logo */
+        .role-badge { display: block; text-align: center; font-weight: bold; background: #e0e0e0; padding: 5px; border-radius: 4px; margin-bottom: 15px; }
         .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-img { max-width: 100px; height: auto; border-radius: 50%; object-fit: cover; }
-        .logo-beranda { max-width: 80px; }
-
-        .stok-box { font-size: 24px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
+        .logo-img { max-width: 90px; height: auto; border-radius: 50%; object-fit: cover; }
+        .stok-box { font-size: 28px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input, select, button { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
@@ -22,30 +21,31 @@
         button:hover { background-color: #2980b9; }
         .btn-logout { background-color: #e74c3c; margin-top: 10px; }
         .btn-logout:hover { background-color: #c0392b; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .btn-approve { background-color: #2ecc71; width: auto; padding: 5px 10px; display: inline-block; }
+        .btn-reject { background-color: #e74c3c; width: auto; padding: 5px 10px; display: inline-block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: #f2f2f2; }
         .badge-masuk { color: #2ecc71; font-weight: bold; }
         .badge-keluar { color: #e74c3c; font-weight: bold; }
-        
-        /* Pengaturan Tampilan Halaman */
+        .badge-pending { color: #f39c12; font-style: italic; }
         .hidden { display: none !important; }
         .error-msg { color: #e74c3c; font-size: 14px; text-align: center; margin-top: 10px; font-weight: bold; }
+        .chart-container { position: relative; margin: auto; height: 250px; width: 100%; }
     </style>
 </head>
 <body>
 
     <!-- ================= 1. HALAMAN LOGIN ================= -->
     <div id="loginPage" class="card">
-        <!-- Logo di Halaman Login -->
         <div class="logo-container">
-            <img src="logo.png" alt="Logo Beras" class="logo-img">
+            <img src="https://unsplash.com" alt="Logo" class="logo-img">
         </div>
         <h1>🔐 Login Sistem</h1>
         <form id="formLogin">
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Masukkan username" required>
+                <input type="text" id="username" placeholder="admin atau user" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
@@ -56,46 +56,58 @@
         </form>
     </div>
 
-    <!-- ================= 2. HALAMAN UTAMA MONITORING (TERKUNCI) ================= -->
+    <!-- ================= 2. HALAMAN DASHBOARD UTAMA ================= -->
     <div id="mainPage" class="hidden">
-        <!-- Logo di Halaman Beranda -->
         <div class="logo-container">
-            <img src="logo.png" alt="Logo Beras" class="logo-img logo-beranda">
+            <img src="https://unsplash.com" alt="Logo" class="logo-img">
         </div>
-        <h1>🌾 Monitoring Stok Beras</h1>
+        <span id="displayRole" class="role-badge">ROLE: -</span>
 
-        <!-- Ringkasan Total Stok -->
+        <!-- Ringkasan Stok & Grafik (Terlihat oleh Admin & User) -->
         <div class="card">
-            <h2>Total Stok Saat Ini</h2>
+            <h2>Sisa Stok Saat Ini</h2>
             <div class="stok-box" id="totalStok">0 Kg</div>
+            <!-- Wadah Grafik -->
+            <div class="chart-container">
+                <canvas id="stokChart"></canvas>
+            </div>
         </div>
 
-        <!-- Form Input Manual -->
-        <div class="card">
-            <h2>Input Transaksi Beras</h2>
-            <form id="formBeras">
+        <!-- Form Input Admin (Hanya Masuk) -->
+        <div id="formAdminBox" class="card hidden">
+            <h2>Input Beras Masuk (Admin Only)</h2>
+            <form id="formAdmin">
                 <div class="form-group">
-                    <label for="jenis">Jenis Transaksi</label>
-                    <select id="jenis" required>
-                        <option value="masuk">Beras Masuk (+)</option>
-                        <option value="keluar">Beras Keluar (-)</option>
-                    </select>
+                    <label for="jumlahMasuk">Jumlah Masuk (Kg)</label>
+                    <input type="number" id="jumlahMasuk" min="0.1" step="0.1" placeholder="Contoh: 100" required>
                 </div>
                 <div class="form-group">
-                    <label for="jumlah">Jumlah (Kg)</label>
-                    <input type="number" id="jumlah" min="0.1" step="0.1" placeholder="Contoh: 50" required>
+                    <label for="ketMasuk">Keterangan Supplier</label>
+                    <input type="text" id="ketMasuk" placeholder="Contoh: Kiriman dari Supplier A" required>
                 </div>
-                <div class="form-group">
-                    <label for="keterangan">Keterangan</label>
-                    <input type="text" id="keterangan" placeholder="Contoh: Supplier A atau Toko Berkah" required>
-                </div>
-                <button type="submit">Simpan Transaksi</button>
+                <button type="submit">Simpan Beras Masuk</button>
             </form>
         </div>
 
-        <!-- Tabel Riwayat -->
+        <!-- Form Input User (Hanya Keluar) -->
+        <div id="formUserBox" class="card hidden">
+            <h2>Ajukan Pengajuan Beras Keluar (User)</h2>
+            <form id="formUser">
+                <div class="form-group">
+                    <label for="jumlahKeluar">Jumlah Keluar (Kg)</label>
+                    <input type="number" id="jumlahKeluar" min="0.1" step="0.1" placeholder="Contoh: 15" required>
+                </div>
+                <div class="form-group">
+                    <label for="ketKeluar">Keterangan Keperluan</label>
+                    <input type="text" id="ketKeluar" placeholder="Contoh: Distribusi Toko B" required>
+                </div>
+                <button type="submit" style="background-color: #e74c3c;">Kirim Pengajuan Keluar</button>
+            </form>
+        </div>
+
+        <!-- Tabel Riwayat & Approval -->
         <div class="card">
-            <h2>Riwayat Mutasi Beras</h2>
+            <h2>Riwayat & Validasi Transaksi</h2>
             <table>
                 <thead>
                     <tr>
@@ -103,6 +115,7 @@
                         <th>Jenis</th>
                         <th>Jumlah</th>
                         <th>Keterangan</th>
+                        <th>Status / Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tabelRiwayat"></tbody>
@@ -111,98 +124,81 @@
         </div>
     </div>
 
-    <!-- ================= LOGIKA SISTEM (JAVASCRIPT) ================= -->
+    <!-- ================= LOGIKA JAVASCRIPT ================= -->
     <script>
-        const USERNAME_BENAR = "admin";
-        const PASSWORD_BENAR = "beras123";
+        // Data Login
+        const KREDENSIAL = {
+            "admin": { pass: "beras123", role: "ADMIN" },
+            "user": { pass: "user123", role: "USER" }
+        };
 
+        // DOM
         const loginPage = document.getElementById('loginPage');
         const mainPage = document.getElementById('mainPage');
-        const formLogin = document.getElementById('formLogin');
-        const loginError = document.getElementById('loginError');
-        const btnLogout = document.getElementById('btnLogout');
-        
-        const formBeras = document.getElementById('formBeras');
-        const totalStokEl = document.getElementById('totalStok');
+        const displayRole = document.getElementById('displayRole');
+        const formAdminBox = document.getElementById('formAdminBox');
+        const formUserBox = document.getElementById('formUserBox');
         const tabelRiwayatEl = document.getElementById('tabelRiwayat');
+        const totalStokEl = document.getElementById('totalStok');
+        
+        let currentRole = sessionStorage.getItem('userRole') || "";
+        let dataBeras = JSON.parse(localStorage.getItem('dataBerasApproval')) || [];
+        let stokChart = null;
 
-        let dataBeras = JSON.parse(localStorage.getItem('dataBeras')) || [];
-
+        // Cek Sesi Login Aktif
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-            tampilkanHalamanUtama();
+            bukaDashboard(currentRole);
         }
 
-        formLogin.addEventListener('submit', function(e) {
+        // Aksi Login
+        document.getElementById('formLogin').addEventListener('submit', function(e) {
             e.preventDefault();
-            const userIn = document.getElementById('username').value;
+            const userIn = document.getElementById('username').value.trim().toLowerCase();
             const passIn = document.getElementById('password').value;
 
-            if (userIn === USERNAME_BENAR && passIn === PASSWORD_BENAR) {
+            if (KREDENSIAL[userIn] && KREDENSIAL[userIn].pass === passIn) {
+                const role = KREDENSIAL[userIn].role;
                 sessionStorage.setItem('isLoggedIn', 'true');
-                loginError.classList.add('hidden');
-                formLogin.reset();
-                tampilkanHalamanUtama();
+                sessionStorage.setItem('userRole', role);
+                document.getElementById('loginError').classList.add('hidden');
+                document.getElementById('formLogin').reset();
+                bukaDashboard(role);
             } else {
-                loginError.classList.remove('hidden');
+                document.getElementById('loginError').classList.remove('hidden');
             }
         });
 
-        btnLogout.addEventListener('click', function() {
-            sessionStorage.removeItem('isLoggedIn');
-            mainPage.classList.add('hidden');
-            loginPage.classList.remove('hidden');
-        });
-
-        function tampilkanHalamanUtama() {
+        // Buka Tampilan Dashboard Sesuai Role
+        function bukaDashboard(role) {
+            currentRole = role;
             loginPage.classList.add('hidden');
             mainPage.classList.remove('hidden');
-            updateUI();
+            displayRole.innerText = `MASUK SEBAGAI: ${role}`;
+
+            if (role === 'ADMIN') {
+                formAdminBox.classList.remove('hidden');
+                formUserBox.classList.add('hidden');
+            } else {
+                formUserBox.classList.remove('hidden');
+                formAdminBox.classList.add('hidden');
+            }
+            updateSistem();
         }
 
-        function updateUI() {
-            tabelRiwayatEl.innerHTML = '';
-            let total = 0;
-
-            dataBeras.slice().reverse().forEach(item => {
-                if (item.jenis === 'masuk') {
-                    total += parseFloat(item.jumlah);
-                } else {
-                    total -= parseFloat(item.jumlah);
-                }
-
-                const row = `<tr>
-                    <td>${item.tanggal}</td>
-                    <td class="${item.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar'}">${item.jenis.toUpperCase()}</td>
-                    <td>${item.jumlah} Kg</td>
-                    <td>${item.keterangan}</td>
-                </tr>`;
-                tabelRiwayatEl.innerHTML += row;
-            });
-
-            totalStokEl.innerText = `${total.toFixed(1)} Kg`;
-        }
-
-        formBeras.addEventListener('submit', function(e) {
+        // Tambah Data Beras Masuk (Oleh Admin - Otomatis Setuju)
+        document.getElementById('formAdmin').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            const jenis = document.getElementById('jenis').value;
-            const jumlah = document.getElementById('jumlah').value;
-            const keterangan = document.getElementById('keterangan').value;
-            const tanggalNow = new Date().toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-            const transaksiBaru = {
-                tanggal: tanggalNow,
-                jenis: jenis,
-                jumlah: jumlah,
-                keterangan: keterangan
-            };
-
-            dataBeras.push(transaksiBaru);
-            localStorage.setItem('dataBeras', JSON.stringify(dataBeras));
-
-            formBeras.reset();
-            updateUI();
+            tambahTransaksi('masuk', document.getElementById('jumlahMasuk').value, document.getElementById('ketMasuk').value, 'disetujui');
+            document.getElementById('formAdmin').reset();
         });
-    </script>
-</body>
-</html>
+
+        // Tambah Data Beras Keluar (Oleh User - Status Menunggu Persetujuan)
+        document.getElementById('formUser').addEventListener('submit', function(e) {
+            e.preventDefault();
+            tambahTransaksi('keluar', document.getElementById('jumlahKeluar').value, document.getElementById('ketKeluar').value, 'menunggu');
+            document.getElementById('formUser').reset();
+        });
+
+        function tambahTransaksi(jenis, jumlah, keterangan, status) {
+            const transaksi = {
+                id: Date.now(),
