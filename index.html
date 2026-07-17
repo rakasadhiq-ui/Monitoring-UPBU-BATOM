@@ -1278,27 +1278,30 @@ let aksi="";
 
 if(role=="ADMIN"){
 
-if(item.status=="Menunggu"){
+    if(item.status=="Menunggu"){
 
-aksi +=
-`<button class="btn btn-success btn-sm me-1"
-onclick="approve(${item.id})">
-<i class="fa fa-check"></i>
-</button>`;
+        aksi += `
+        <button class="btn btn-success btn-sm"
+        onclick="approve(${item.id})">
+        <i class="fa fa-check"></i>
+        </button>
+        `;
 
-aksi +=
-`<button class="btn btn-warning btn-sm me-1"
-onclick="reject(${item.id})">
-<i class="fa fa-xmark"></i>
-</button>`;
+        aksi += `
+        <button class="btn btn-warning btn-sm"
+        onclick="reject(${item.id})">
+        <i class="fa fa-xmark"></i>
+        </button>
+        `;
 
-}
+    }
 
-aksi +=
-`<button class="btn btn-danger btn-sm"
-onclick="hapus(${item.id})">
-<i class="fa fa-trash"></i>
-</button>`;
+    aksi += `
+    <button class="btn btn-danger btn-sm"
+    onclick="hapus(${item.id})">
+    <i class="fa fa-trash"></i>
+    </button>
+    `;
 
 }
 
