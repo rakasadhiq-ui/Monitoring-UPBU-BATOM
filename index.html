@@ -3,55 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Aman & Gratis</title>
-    <!-- Mengambil script resmi dari Supabase untuk keamanan -->
-    <script src="https://jsdelivr.net"></script>
+    <title>Web Monitoring Beras</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { text-align: center; color: #333; }
+        .stok-box { font-size: 24px; font-weight: bold; text-align: center; color: #2ecc71; margin: 10px 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, button { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #2980b9; }
+        .btn-logout { background-color: #e74c3c; margin-top: 10px; }
+        .btn-logout:hover { background-color: #c0392b; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .badge-masuk { color: #2ecc71; font-weight: bold; }
+        .badge-keluar { color: #e74c3c; font-weight: bold; }
+        
+        /* Pengaturan Tampilan Halaman */
+        .hidden { display: none !important; }
+        .error-msg { color: #e74c3c; font-size: 14px; text-align: center; margin-top: 10px; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-    <h2>Form Pendaftaran & Login</h2>
-    <input type="email" id="email" placeholder="Masukkan Email">
-    <input type="password" id="password" placeholder="Masukkan Password">
-    
-    <button onclick="daftar()">Daftar Akun</button>
-    <button onclick="login()">Masuk</button>
+    <!-- ================= 1. HALAMAN LOGIN ================= -->
+    <div id="loginPage" class="card">
+        <h1>🔐 Login Sistem</h1>
+        <form id="formLogin">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Masukkan username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Masukkan password" required>
+            </div>
+            <button type="submit">Masuk</button>
+            <div id="loginError" class="error-msg hidden">Username atau Password salah!</div>
+        </form>
+    </div>
 
-    <h3 id="status"></h3>
+    <!-- ================= 2. HALAMAN UTAMA MONITORING (TERKUNCI) ================= -->
+    <div id="mainPage" class="hidden">
+        <h1>🌾 Monitoring Stok Beras</h1>
 
+        <!-- Ringkasan Total Stok -->
+        <div class="card">
+            <h2>Total Stok Saat Ini</h2>
+            <div class="stok-box" id="totalStok">0 Kg</div>
+        </div>
+
+        <!-- Form Input Manual -->
+        <div class="card">
+            <h2>Input Transaksi Beras</h2>
+            <form id="formBeras">
+                <div class="form-group">
+                    <label for="jenis">Jenis Transaksi</label>
+                    <select id="jenis" required>
+                        <option value="masuk">Beras Masuk (+)</option>
+                        <option value="keluar">Beras Keluar (-)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jumlah">Jumlah (Kg)</label>
+                    <input type="number" id="jumlah" min="0.1" step="0.1" placeholder="Contoh: 50" required>
+                </div>
+                <div class="form-group">
+                    <label for="keterangan">Keterangan</label>
+                    <input type="text" id="keterangan" placeholder="Contoh: Supplier A atau Toko Berkah" required>
+                </div>
+                <button type="submit">Simpan Transaksi</button>
+            </form>
+        </div>
+
+        <!-- Tabel Riwayat -->
+        <div class="card">
+            <h2>Riwayat Mutasi Beras</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jenis</th>
+                        <th>Jumlah</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelRiwayat"></tbody>
+            </table>
+            <button id="btnLogout" class="btn-logout">Keluar (Logout)</button>
+        </div>
+    </div>
+
+    <!-- ================= LOGIKA SISTEM (JAVASCRIPT) ================= -->
     <script>
-        // ISI DENGAN DATA DARI SUPABASE ANDA
-        const SUPABASE_URL = "https://dedzktgarhqtwigxpzcv.supabase.co/rest/v1/";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZHprdGdhcmhxdHdpZ3hwemN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTE2NzMsImV4cCI6MjA5OTg2NzY3M30.WK5AzOmv9QxOCJr8HZ6YBsZAuDgUVUgsi00rleDjetU";
+        // --- PENGATURAN AKUN LOGIN ---
+        // Ganti username dan password di bawah ini sesuai keinginan Anda
+        const USERNAME_BENAR = "admin";
+        const PASSWORD_BENAR = "Batom2025";
+
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const mainPage = document.getElementById('mainPage');
+        const formLogin = document.getElementById('formLogin');
+        const loginError = document.getElementById('loginError');
+        const btnLogout = document.getElementById('btnLogout');
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const formBeras = document.getElementById('formBeras');
+        const totalStokEl = document.getElementById('totalStok');
+        const tabelRiwayatEl = document.getElementById('tabelRiwayat');
 
-        // Fungsi Daftar Akun secara Aman
-        async function daftar() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            
-            if (error) {
-                document.getElementById('status').innerText = "Gagal: " + error.message;
-            } else {
-                document.getElementById('status').innerText = "Daftar berhasil! Cek email untuk verifikasi.";
-            }
+        // Database internal browser
+        let dataBeras = JSON.parse(localStorage.getItem('dataBeras')) || [];
+
+        // --- CEK STATUS LOGIN SAAT HALAMAN DIBUKA ---
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            tampilkanHalamanUtama();
         }
 
-        // Fungsi Login secara Aman
-        async function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                document.getElementById('status').innerText = "Login Gagal: " + error.message;
+        // --- PROSES LOGIN ---
+        formLogin.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userIn = document.getElementById('username').value;
+            const passIn = document.getElementById('password').value;
+
+            if (userIn === USERNAME_BENAR && passIn === PASSWORD_BENAR) {
+                sessionStorage.setItem('isLoggedIn', 'true'); // Menyimpan status login selama tab browser dibuka
+                loginError.classList.add('hidden');
+                formLogin.reset();
+                tampilkanHalamanUtama();
             } else {
-                document.getElementById('status').innerText = "Login Berhasil! Selamat datang.";
+                loginError.classList.remove('hidden');
             }
+        });
+
+        // --- PROSES LOGOUT ---
+        btnLogout.addEventListener('click', function() {
+            sessionStorage.removeItem('isLoggedIn');
+            mainPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+
+        // --- FUNGSI MENAMPILKAN HALAMAN UTAMA ---
+        function tampilkanHalamanUtama() {
+            loginPage.classList.add('hidden');
+            mainPage.classList.remove('hidden');
+            updateUI();
         }
+
+        // --- PROSES UPDATE UI & HITUNG STOK ---
+        function updateUI() {
+            tabelRiwayatEl.innerHTML = '';
+            let total = 0;
+
+            dataBeras.slice().reverse().forEach(item => {
+                if (item.jenis === 'masuk') {
+                    total += parseFloat(item.jumlah);
+                } else {
+                    total -= parseFloat(item.jumlah);
+                }
+
+                const row = `<tr>
+                    <td>${item.tanggal}</td>
+                    <td class="${item.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar'}">${item.jenis.toUpperCase()}</td>
+                    <td>${item.jumlah} Kg</td>
+                    <td>${item.keterangan}</td>
+                </tr>`;
+                tabelRiwayatEl.innerHTML += row;
+            });
+
+            totalStokEl.innerText = `${total.toFixed(1)} Kg`;
+        }
+
+        // --- PROSES SIMPAN DATA BERAS ---
+        formBeras.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const jenis = document.getElementById('jenis').value;
+            const jumlah = document.getElementById('jumlah').value;
+            const keterangan = document.getElementById('keterangan').value;
+            const tanggalNow = new Date().toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            const transaksiBaru = {
+                tanggal: tanggalNow,
+                jenis: jenis,
+                jumlah: jumlah,
+                keterangan: keterangan
+            };
+
+            dataBeras.push(transaksiBaru);
+            localStorage.setItem('dataBeras', JSON.stringify(dataBeras));
+
+            formBeras.reset();
+            updateUI();
+        });
     </script>
 </body>
 </html>
