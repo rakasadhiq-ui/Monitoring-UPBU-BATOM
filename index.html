@@ -202,3 +202,167 @@
         function tambahTransaksi(jenis, jumlah, keterangan, status) {
             const transaksi = {
                 id: Date.now(),
+                        // --- PROSES TAMBAH DATA BERAS (CEK VALIDASI STOK USER) ---
+        function tambahTransaksi(jenis, jumlah, keterangan, status) {
+            const jumlahFloat = parseFloat(jumlah);
+            
+            // Validasi: User tidak boleh mengajukan keluar melebihi sisa stok yang ada saat ini
+            if (jenis === 'keluar' && status === 'menunggu') {
+                let stokSaatIni = 0;
+                dataBeras.forEach(item => {
+                    if (item.status === 'disetujui') {
+                        stokSaatIni += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
+                    }
+                });
+                
+                if (jumlahFloat > stokSaatIni) {
+                    alert(`Gagal! Stok tidak cukup. Sisa stok saat ini hanya ${stokSaatIni.toFixed(1)} Kg.`);
+                    return; // Batalkan proses input
+                }
+            }
+
+            const transaksi = {
+                id: Date.now(),
+                // Format manual agar seragam tanpa masalah koma/spasi dari toLocaleDateString
+                tanggal: new Date().toLocaleDateString('id-ID') + ' ' + new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}),
+                jenis: jenis,
+                jumlah: jumlahFloat,
+                keterangan: keterangan,
+                status: status
+            };
+            dataBeras.push(transaksi);
+            localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+            updateSistem();
+        }
+
+        // --- ADMIN MENYETUJUI TRANSAKSI KELUAR USER (DENGAN CEK STOK AKHIR) ---
+        function setujuiTransaksi(id) {
+            const index = dataBeras.findIndex(item => item.id === id);
+            if (index !== -1) {
+                // Hitung ulang stok sebelum menyetujui, mengantisipasi stok menipis karena transaksi lain
+                let totalStok = 0;
+                dataBeras.forEach(item => {
+                    if (item.status === 'disetujui') {
+                        totalStok += (item.jenis === 'masuk') ? item.jumlah : -item.jumlah;
+                    }
+                });
+
+                if (dataBeras[index].jenis === 'keluar' && dataBeras[index].jumlah > totalStok) {
+                    alert(`Gagal menyetujui! Stok saat ini (${totalStok.toFixed(1)} Kg) tidak mencukupi untuk pengeluaran sebesar ${dataBeras[index].jumlah} Kg.`);
+                    return;
+                }
+
+                dataBeras[index].status = 'disetujui';
+                localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+                updateSistem();
+            }
+        }
+
+        // --- ADMIN MENOLAK TRANSAKSI KELUAR USER ---
+        function tolakTransaksi(id) {
+            const index = dataBeras.findIndex(item => item.id === id);
+            if (index !== -1) {
+                dataBeras[index].status = 'ditolak';
+                localStorage.setItem('dataBerasApproval', JSON.stringify(dataBeras));
+                updateSistem();
+            }
+        }
+
+        // --- KALKULASI SEMUA DATA & UPDATE VISUAL (FIXED GRAPH LOGIC) ---
+        function updateSistem() {
+            tabelRiwayatEl.innerHTML = '';
+            let totalStok = 0;
+            
+            // Penampung data grafik chronological (dari lama ke baru)
+            let riwayatStokGrafik =; // Mulai dari angka nol
+            let labelTanggalGrafik = ['Mulai'];
+
+            // Proses data & hitung stok akhir
+            dataBeras.forEach(item => {
+                if (item.status === 'disetujui') {
+                    if (item.jenis === 'masuk') {
+                        totalStok += item.jumlah;
+                    } else {
+                        totalStok -= item.jumlah;
+                    }
+                    // Grafik HANYA mencatat perubahan jika transaksi disetujui (stok berubah nyata)
+                    riwayatStokGrafik.push(totalStok);
+                    // Ambil komponen tanggal saja sebelum spasi jam
+                    const tglSaja = item.tanggal.split(' ')[0];
+                    labelTanggalGrafik.push(tglSaja);
+                }
+            });
+
+            // Tampilkan total stok di box utama
+            totalStokEl.innerText = `${totalStok.toFixed(1)} Kg`;
+
+            // Render baris tabel (terbalik agar data terbaru berada di atas untuk kenyamanan user)
+            dataBeras.slice().reverse().forEach(item => {
+                let aksiKolon = '';
+                
+                if (item.status === 'menunggu') {
+                    if (currentRole === 'ADMIN') {
+                        aksiKolon = `<button class="btn-approve" onclick="setujuiTransaksi(${item.id})">✔</button> 
+                                     <button class="btn-reject" onclick="tolakTransaksi(${item.id})">❌</button>`;
+                    } else {
+                        aksiKolon = `<span class="badge-pending">Menunggu Admin</span>`;
+                    }
+                } else {
+                    aksiKolon = item.status === 'disetujui' ? '✅ Disetujui' : '🚫 Ditolak';
+                }
+
+                const row = `<tr>
+                    <td>${item.tanggal}</td>
+                    <td class="${item.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar'}">${item.jenis.toUpperCase()}</td>
+                    <td>${item.jumlah} Kg</td>
+                    <td>${item.keterangan}</td>
+                    <td>${aksiKolon}</td>
+                </tr>`;
+                tabelRiwayatEl.innerHTML += row;
+            });
+
+            // Gambar ulang grafik dengan data yang valid
+            renderGrafik(labelTanggalGrafik, riwayatStokGrafik);
+        }
+
+        // --- LOGIKA MENGGAMBAR GRAFIK TREN ---
+        function renderGrafik(labels, data) {
+            if (stokChart) stokChart.destroy(); // Bersihkan instance lama agar tidak terjadi tumpang tindih
+
+            const ctx = document.getElementById('stokChart').getContext('2d');
+            stokChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tren Sisa Stok Beras (Kg)',
+                        data: data,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.2, // Membuat garis sedikit melengkung halus
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) { return value + ' Kg'; } // Menambahkan satuan Kg di sumbu Y grafik
+                            }
+                        } 
+                    }
+                }
+            });
+        }
+
+        // --- AKSI LOGOUT ---
+        document.getElementById('btnLogout').addEventListener('click', function() {
+            sessionStorage.clear();
+            mainPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        });
+
