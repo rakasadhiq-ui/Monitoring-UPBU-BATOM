@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Aman & Gratis</title>
+    <!-- Mengambil script resmi dari Supabase untuk keamanan -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+
+    <h2>Form Pendaftaran & Login</h2>
+    <input type="email" id="email" placeholder="Masukkan Email">
+    <input type="password" id="password" placeholder="Masukkan Password">
+    
+    <button onclick="daftar()">Daftar Akun</button>
+    <button onclick="login()">Masuk</button>
+
+    <h3 id="status"></h3>
+
+    <script>
+        // ISI DENGAN DATA DARI SUPABASE ANDA
+        const SUPABASE_URL = "https://dedzktgarhqtwigxpzcv.supabase.co/rest/v1/";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZHprdGdhcmhxdHdpZ3hwemN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTE2NzMsImV4cCI6MjA5OTg2NzY3M30.WK5AzOmv9QxOCJr8HZ6YBsZAuDgUVUgsi00rleDjetU";
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Fungsi Daftar Akun secara Aman
+        async function daftar() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            
+            if (error) {
+                document.getElementById('status').innerText = "Gagal: " + error.message;
+            } else {
+                document.getElementById('status').innerText = "Daftar berhasil! Cek email untuk verifikasi.";
+            }
+        }
+
+        // Fungsi Login secara Aman
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                document.getElementById('status').innerText = "Login Gagal: " + error.message;
+            } else {
+                document.getElementById('status').innerText = "Login Berhasil! Selamat datang.";
+            }
+        }
+    </script>
+</body>
+</html>
