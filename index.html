@@ -2,3122 +2,973 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sistem Monitoring Stok Beras | UPBU Kelas III Batom</title>
-
-    <link rel="icon" href="favicon.ico">
+    <title>Monitoring Stok Beras - Sistem Inventaris Gudang</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- ChartJS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- ChartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+        body {
+            background: #eef2f7;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
 
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #198754;
+            color: white;
+            overflow: auto;
+            transition: .3s;
+            z-index: 1000;
+        }
+
+        .sidebar .app-icon {
+            font-size: 60px;
+            display: block;
+            text-align: center;
+            margin: 20px auto 10px;
+            color: #ffc107;
+        }
+
+        .sidebar h4 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 14px 25px;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .navbar-custom {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, .05);
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 18px;
+            color: white;
+            transition: .3s;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, .1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .bg1 { background: #198754; }
+        .bg2 { background: #0d6efd; }
+        .bg3 { background: #dc3545; }
+        .bg4 { background: #ffc107; color: black !important; }
+
+        .stat-card i {
+            font-size: 42px;
+            opacity: 0.8;
+        }
+
+        .card {
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .04);
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        /* Dark Mode Styles */
+        body.dark {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark .card,
+        body.dark .navbar-custom,
+        body.dark .modal-content {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+
+        body.dark table {
+            color: #e0e0e0;
+        }
+        
+        body.dark th {
+            background-color: #2c3e50 !important;
+            color: #fff !important;
+        }
+
+        body.dark td {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0 !important;
+            border-color: #333;
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar h4,
+            .sidebar a span {
+                display: none;
+            }
+
+            .content {
+                margin-left: 70px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- ================= PRELOADER ================= -->
+<!-- Pembungkus Utama Aplikasi (Akan disembunyikan via JS jika belum login demi keamanan data) -->
+<div id="mainApp" class="d-none">
 
-<div id="preloader">
+    <div class="sidebar">
+        <!-- Mengganti logo.png dengan Icon bawaan FontAwesome agar tidak broken di GitHub -->
+        <div class="text-center">
+            <i class="fa fa-cubes app-icon"></i>
+        </div>
+        <h4>MONITORING BERAS</h4>
 
-    <div class="loader"></div>
-
-</div>
-
-<!-- ================= SIDEBAR ================= -->
-
-<aside class="sidebar">
-
-    <div class="sidebar-header">
-
-        <img src="logo.png" class="logo">
-
-        <h4>UPBU BATOM</h4>
-
-        <small>Monitoring Stok Beras</small>
-
+        <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+            <i class="fa fa-house"></i>
+            <span> Dashboard</span>
+        </a>
+        <a href="#" onclick="document.getElementById('tabelSection').scrollIntoView({behavior: 'smooth'}); return false;">
+            <i class="fa fa-box"></i>
+            <span> Stok & Riwayat</span>
+        </a>
+        <a href="#" onclick="document.getElementById('grafikSection').scrollIntoView({behavior: 'smooth'}); return false;">
+            <i class="fa fa-chart-line"></i>
+            <span> Statistik</span>
+        </a>
+        <a href="#" id="btnDark">
+            <i class="fa fa-moon"></i>
+            <span> Dark Mode</span>
+        </a>
+        <a href="#" id="btnLogout">
+            <i class="fa fa-right-from-bracket"></i>
+            <span> Logout</span>
+        </a>
     </div>
 
-    <ul class="menu">
-
-        <li class="active">
-
-            <a href="#">
-
-                <i class="fa-solid fa-house"></i>
-
-                <span>Dashboard</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#stok">
-
-                <i class="fa-solid fa-box"></i>
-
-                <span>Data Stok</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#grafik">
-
-                <i class="fa-solid fa-chart-column"></i>
-
-                <span>Grafik</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#laporan">
-
-                <i class="fa-solid fa-file-lines"></i>
-
-                <span>Laporan</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#backup">
-
-                <i class="fa-solid fa-database"></i>
-
-                <span>Backup</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#" id="btnDark">
-
-                <i class="fa-solid fa-moon"></i>
-
-                <span>Dark Mode</span>
-
-            </a>
-
-        </li>
-
-        <li>
-
-            <a href="#" id="btnLogout">
-
-                <i class="fa-solid fa-right-from-bracket"></i>
-
-                <span>Logout</span>
-
-            </a>
-
-        </li>
-
-    </ul>
-
-</aside>
-
-<!-- ================= CONTENT ================= -->
-
-<div class="main">
-
-<!-- ================= NAVBAR ================= -->
-
-<nav class="topbar">
-
-    <button class="btn-menu">
-
-        <i class="fa-solid fa-bars"></i>
-
-    </button>
-
-    <div class="title">
-
-        Sistem Monitoring Stok Beras
-
-    </div>
-
-    <div class="user-info">
-
-        <button class="btn btn-light">
-
-            <i class="fa-solid fa-bell"></i>
-
-        </button>
-
-        <span>
-
-            <i class="fa-solid fa-user"></i>
-
-            <span id="namaUser">
-
-                Administrator
-
-            </span>
-
-        </span>
-
-    </div>
-
-</nav>
-
-<!-- ================= DASHBOARD ================= -->
-
-<section class="dashboard">
-
-<div class="row g-4">
-
-<div class="col-lg-3 col-md-6">
-
-<div class="card card-total">
-
-<div class="card-body">
-
-<div class="icon">
-
-<i class="fa-solid fa-box"></i>
-
-</div>
-
-<div>
-
-<p>Total Stok</p>
-
-<h2 id="totalStok">
-
-0 Kg
-
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-lg-3 col-md-6">
-
-<div class="card card-masuk">
-
-<div class="card-body">
-
-<div class="icon">
-
-<i class="fa-solid fa-arrow-down"></i>
-
-</div>
-
-<div>
-
-<p>Beras Masuk</p>
-
-<h2 id="totalMasuk">
-
-0 Kg
-
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-lg-3 col-md-6">
-
-<div class="card card-keluar">
-
-<div class="card-body">
-
-<div class="icon">
-
-<i class="fa-solid fa-arrow-up"></i>
-
-</div>
-
-<div>
-
-<p>Beras Keluar</p>
-
-<h2 id="totalKeluar">
-
-0 Kg
-
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-lg-3 col-md-6">
-
-<div class="card card-pending">
-
-<div class="card-body">
-
-<div class="icon">
-
-<i class="fa-solid fa-clock"></i>
-
-</div>
-
-<div>
-
-<p>Pending</p>
-
-<h2 id="totalPending">
-
-0
-
-</h2>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<br>
-
-<div class="row">
-
-<div class="col-lg-8">
-
-<div class="card">
-
-<div class="card-header">
-
-Grafik Stok Beras
-
-</div>
-
-<div class="card-body">
-
-<canvas id="barChart"></canvas>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="col-lg-4">
-
-<div class="card">
-
-<div class="card-header">
-
-Komposisi Stok
-
-</div>
-
-<div class="card-body">
-
-<canvas id="pieChart"></canvas>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<br><!-- ================= MENU AKSI ================= -->
-
-<div class="card shadow-sm border-0 mb-4">
-
-    <div class="card-body">
-
-        <div class="row g-3 align-items-center">
-
-            <div class="col-lg-3">
-
-                <button
-                    class="btn btn-primary w-100"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalMasuk">
-
-                    <i class="fa-solid fa-plus"></i>
-
-                    Tambah Beras Masuk
-
-                </button>
-
+    <div class="content">
+        <!-- NAVBAR -->
+        <div class="navbar-custom d-flex justify-content-between align-items-center">
+            <div>
+                <h3>
+                    <i class="fa fa-warehouse text-success me-2"></i>Monitoring Stok Beras
+                </h3>
+                <small class="text-muted">Sistem Manajemen & Inventaris Gudang Pusat</small>
             </div>
-
-            <div class="col-lg-3">
-
-                <button
-                    class="btn btn-danger w-100"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalKeluar">
-
-                    <i class="fa-solid fa-paper-plane"></i>
-
-                    Pengajuan Keluar
-
-                </button>
-
+            <div>
+                <span class="badge bg-success p-2 fs-6">
+                    <i class="fa fa-user me-2"></i><span id="namaRole">ADMIN</span>
+                </span>
             </div>
-
-            <div class="col-lg-3">
-
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control"
-                    placeholder="Cari transaksi...">
-
-            </div>
-
-            <div class="col-lg-3">
-
-                <select
-                    id="filterStatus"
-                    class="form-select">
-
-                    <option value="">Semua Status</option>
-
-                    <option value="Disetujui">Disetujui</option>
-
-                    <option value="Menunggu">Menunggu</option>
-
-                    <option value="Ditolak">Ditolak</option>
-
-                </select>
-
-            </div>
-
         </div>
 
-    </div>
-
-</div>
-
-<!-- ================= TABEL ================= -->
-
-<div class="card shadow-sm border-0">
-
-    <div class="card-header d-flex justify-content-between align-items-center">
-
-        <h5 class="mb-0">
-
-            <i class="fa-solid fa-table"></i>
-
-            Riwayat Transaksi
-
-        </h5>
-
-        <div>
-
-            <button class="btn btn-success btn-sm" id="btnExcel">
-
-                <i class="fa-solid fa-file-excel"></i>
-
-                Excel
-
-            </button>
-
-            <button class="btn btn-danger btn-sm" id="btnPDF">
-
-                <i class="fa-solid fa-file-pdf"></i>
-
-                PDF
-
-            </button>
-
-            <button class="btn btn-secondary btn-sm" id="btnPrint">
-
-                <i class="fa-solid fa-print"></i>
-
-                Print
-
-            </button>
-
+        <!-- STATISTIC CARDS -->
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg1">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6>Total Stok Saat Ini</h6>
+                                <h2 id="stokTotal" class="fw-bold">0 Kg</h2>
+                            </div>
+                            <i class="fa fa-boxes-stacked"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg2">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6>Total Beras Masuk</h6>
+                                <h2 id="stokMasuk" class="fw-bold">0 Kg</h2>
+                            </div>
+                            <i class="fa fa-arrow-down-long"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg3">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6>Total Beras Keluar</h6>
+                                <h2 id="stokKeluar" class="fw-bold">0 Kg</h2>
+                            </div>
+                            <i class="fa fa-arrow-up-long"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card bg4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6>Menunggu Persetujuan</h6>
+                                <h2 id="stokPending" class="fw-bold">0</h2>
+                            </div>
+                            <i class="fa fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </div>
+        <br>
 
-    <div class="table-responsive">
-
-        <table class="table table-hover align-middle mb-0">
-
-            <thead class="table-light">
-
-                <tr>
-
-                    <th>No</th>
-
-                    <th>Tanggal</th>
-
-                    <th>Jenis</th>
-
-                    <th>Jumlah</th>
-
-                    <th>Keterangan</th>
-
-                    <th>Status</th>
-
-                    <th>Aksi</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody id="tableBody">
-
-                <!-- Data dari JavaScript -->
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-<!-- ================= MODAL BERAS MASUK ================= -->
-
-<div
-    class="modal fade"
-    id="modalMasuk">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-
-            <div class="modal-header bg-primary text-white">
-
-                <h5>
-
-                    Tambah Beras Masuk
-
-                </h5>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="mb-3">
-
-                    <label>Jumlah (Kg)</label>
-
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="masukJumlah">
-
+        <!-- CHART SECTION -->
+        <div class="row g-4" id="grafikSection">
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white fw-bold">
+                        <i class="fa fa-bar-chart me-2"></i>Volume Akumulasi Stok Beras (Kg)
+                    </div>
+                    <div class="card-body d-flex align-items-center">
+                        <canvas id="chartStok" style="max-height: 280px; width: 100%;"></canvas>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-
-                    <label>Keterangan</label>
-
-                    <textarea
-                        class="form-control"
-                        id="masukKeterangan"></textarea>
-
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white fw-bold">
+                        <i class="fa fa-pie-chart me-2"></i>Rasio Frekuensi Transaksi
+                    </div>
+                    <div class="card-body d-flex align-items-center">
+                        <canvas id="pieChart" style="max-height: 280px; width: 100%;"></canvas>
+                    </div>
                 </div>
-
             </div>
-
-            <div class="modal-footer">
-
-                <button
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
-
-                    Batal
-
-                </button>
-
-                <button
-                    class="btn btn-primary"
-                    id="btnSimpanMasuk">
-
-                    Simpan
-
-                </button>
-
-            </div>
-
         </div>
 
-    </div>
+        <br>
 
-</div>
-
-<!-- ================= MODAL BERAS KELUAR ================= -->
-
-<div
-    class="modal fade"
-    id="modalKeluar">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-
-            <div class="modal-header bg-danger text-white">
-
-                <h5>
-
-                    Pengajuan Beras Keluar
-
-                </h5>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="mb-3">
-
-                    <label>Jumlah (Kg)</label>
-
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="keluarJumlah">
-
+        <!-- TOOLBAR & FILTER -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted">Pencarian Kata Kunci</label>
+                        <input type="text" id="searchData" class="form-control" placeholder="Cari keterangan atau jenis...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Filter Status</label>
+                        <select id="filterStatus" class="form-select">
+                            <option value="">Semua Status</option>
+                            <option value="Disetujui">Disetujui</option>
+                            <option value="Menunggu">Menunggu</option>
+                            <option value="Ditolak">Ditolak</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Filter Tanggal</label>
+                        <input type="date" id="filterTanggal" class="form-control">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary w-100" id="btnResetFilter">
+                            <i class="fa fa-arrows-rotate me-1"></i> Reset
+                        </button>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-
-                    <label>Keterangan</label>
-
-                    <textarea
-                        class="form-control"
-                        id="keluarKeterangan"></textarea>
-
-                </div>
-
             </div>
-
-            <div class="modal-footer">
-
-                <button
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
-
-                    Batal
-
-                </button>
-
-                <button
-                    class="btn btn-danger"
-                    id="btnSimpanKeluar">
-
-                    Ajukan
-
-                </button>
-
-            </div>
-
         </div>
 
-    </div>
+        <!-- ACTION BUTTONS MENU -->
+        <div class="card mb-4">
+            <div class="card-body bg-light rounded-3">
+                <div class="row g-2">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#modalMasuk">
+                            <i class="fa fa-plus-circle me-1"></i> Stok Masuk
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#modalKeluar">
+                            <i class="fa fa-minus-circle me-1"></i> Pengajuan Keluar
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <button class="btn btn-outline-success w-100" id="btnExportExcel">
+                            <i class="fa fa-file-excel me-1"></i> Excel
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <button class="btn btn-outline-danger w-100" id="btnExportPDF">
+                            <i class="fa fa-file-pdf me-1"></i> Cetak/PDF
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <button class="btn btn-outline-warning w-100" id="btnBackup">
+                            <i class="fa fa-download me-1"></i> Backup JSON
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <label class="btn btn-outline-info w-100 m-0" for="btnRestore">
+                            <i class="fa fa-upload me-1"></i> Restore
+                        </label>
+                        <input type="file" id="btnRestore" accept=".json" class="d-none" onchange="restoreJSON(this.files[0])">
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- TABLE DATA -->
+        <div class="card mb-5" id="tabelSection">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center fw-bold">
+                <span><i class="fa fa-history me-2"></i>Riwayat Transaksi Logistik</span>
+                <span id="jumlahData" class="badge bg-secondary">0 Data</span>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="table-success">
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="20%">Tanggal & Waktu</th>
+                            <th width="10%">Jenis</th>
+                            <th width="15%">Jumlah</th>
+                            <th width="25%">Keterangan</th>
+                            <th width="12%">Status</th>
+                            <th width="13%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelData">
+                        <!-- Render Otomatis via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- ================= FOOTER ================= -->
-
-<footer class="footer">
-
-    <p>
-
-        © 2026 Sistem Monitoring Stok Beras
-
-        <strong>
-
-            UPBU Kelas III Batom
-
-        </strong>
-
-    </p>
-
-</footer>
-
-</section>
-
-</div><!-- ================= LOGIN MODAL ================= -->
-
-<div class="modal fade"
-     id="loginModal"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false">
-
+<!-- ================= MODAL LOGIN ================= -->
+<div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content shadow-lg border-0">
-
-            <div class="modal-body p-5">
-
-                <div class="text-center mb-4">
-
-                    <img src="logo.png"
-                         width="90"
-                         class="mb-3">
-
-                    <h3 class="fw-bold">
-
-                        Monitoring Stok Beras
-
-                    </h3>
-
-                    <p class="text-muted">
-
-                        UPBU Kelas III Batom
-
-                    </p>
-
-                </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-
-                        Username
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="username"
-                        class="form-control">
-
-                </div>
-
-                <div class="mb-4">
-
-                    <label class="form-label">
-
-                        Password
-
-                    </label>
-
-                    <input
-                        type="password"
-                        id="password"
-                        class="form-control">
-
-                </div>
-
-                <button
-                    class="btn btn-primary w-100"
-                    id="btnLogin">
-
-                    LOGIN
-
-                </button>
-
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white text-center d-block">
+                <h5 class="modal-title fw-bold"><i class="fa fa-lock me-2"></i>Login Ke Sistem Monitoring</h5>
             </div>
-
+            <div class="modal-body p-4">
+                <div class="text-center mb-4 text-success">
+                    <i class="fa fa-warehouse" style="font-size: 70px;"></i>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Username</label>
+                    <input type="text" class="form-control" id="username" autocomplete="off" placeholder="Masukkan username...">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" placeholder="Masukkan password...">
+                        <button class="btn btn-outline-secondary" type="button" id="showPassword">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-success w-100 py-2 fw-bold" id="btnLogin">
+                    <i class="fa fa-right-to-bracket me-2"></i>Masuk Ke Dashboard
+                </button>
+                <div class="mt-3 text-center text-muted small">
+                    <p class="mb-0">Hint Admin: admin / beras123</p>
+                    <p class="mb-0">Hint User: user / user123</p>
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>
 
-<!-- ================= TOAST ================= -->
-
-<div
-class="position-fixed top-0 end-0 p-3"
-style="z-index:9999">
-
-<div
-id="liveToast"
-class="toast align-items-center text-bg-success border-0">
-
-<div class="d-flex">
-
-<div class="toast-body">
-
-Berhasil
-
+<!-- ================= MODAL STOK MASUK ================= -->
+<div class="modal fade" id="modalMasuk" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold"><i class="fa fa-plus-circle me-2"></i>Input Beras Masuk</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Jumlah Beras (Kg)</label>
+                    <input type="number" id="jumlahMasuk" class="form-control" min="1" placeholder="Contoh: 500">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Keterangan Sumber / Pemasok</label>
+                    <input type="text" id="ketMasuk" class="form-control" placeholder="Contoh: Kilang Padi Maju Jaya">
+                </div>
+                <button class="btn btn-success w-100" id="simpanMasuk">Simpan Ke Gudang</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<button
-type="button"
-class="btn-close btn-close-white me-2 m-auto"
-data-bs-dismiss="toast">
-
-</button>
-
+<!-- ================= MODAL PENGAJUAN KELUAR ================= -->
+<div class="modal fade" id="modalKeluar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fa fa-minus-circle me-2"></i>Pengajuan Beras Keluar</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Jumlah Pengeluaran (Kg)</label>
+                    <input type="number" id="jumlahKeluar" class="form-control" min="1" placeholder="Contoh: 200">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Keterangan Tujuan / Keperluan</label>
+                    <input type="text" id="ketKeluar" class="form-control" placeholder="Contoh: Distribusi Toko Sentosa">
+                </div>
+                <button class="btn btn-danger w-100" id="simpanKeluar">Kirim Formulir Pengajuan</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-</div>
-
-</div>
-
-<!-- ================= LOADING ================= -->
-
-<div id="loadingScreen">
-
-<div class="spinner-border text-primary">
-
-</div>
-
-</div>
-
-<!-- ================= RESTORE JSON ================= -->
-
-<input
-type="file"
-id="restoreFile"
-accept=".json"
-hidden>
-
-<!-- ================= SCRIPT ================= -->
-
+<!-- Bootstrap Bundle JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="app.js"></script>
-
-</body>
-
-</html>
-/* ==========================================================
-   SISTEM MONITORING STOK BERAS
-   UPBU KELAS III BATOM
-   STYLE.CSS
-========================================================== */
-
-:root{
-
-    --primary:#2563eb;
-    --navy:#1e293b;
-    --navy-dark:#0f172a;
-    --hover:#334155;
-    --bg:#f1f5f9;
-    --white:#ffffff;
-    --success:#16a34a;
-    --danger:#dc2626;
-    --warning:#f59e0b;
-    --text:#1f2937;
-    --border:#e2e8f0;
-
-    --shadow:0 8px 25px rgba(0,0,0,.08);
-
-}
-
-*{
-
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-
-}
-
-body{
-
-    font-family:'Poppins',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    overflow-x:hidden;
-
-}
-
-/* ==========================
-PRELOADER
-========================== */
-
-#preloader{
-
-    position:fixed;
-    inset:0;
-    background:#fff;
-    z-index:99999;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-}
-
-.loader{
-
-    width:70px;
-    height:70px;
-
-    border-radius:50%;
-
-    border:7px solid #ddd;
-    border-top:7px solid var(--primary);
-
-    animation:spin 1s linear infinite;
-
-}
-
-@keyframes spin{
-
-    to{
-
-        transform:rotate(360deg);
-
-    }
-
-}
-
-/* ==========================
-SIDEBAR
-========================== */
-
-.sidebar{
-
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:260px;
-    height:100vh;
-
-    background:var(--navy);
-
-    color:#fff;
-
-    transition:.35s;
-
-    z-index:999;
-
-    box-shadow:var(--shadow);
-
-}
-
-.sidebar-header{
-
-    text-align:center;
-
-    padding:30px 15px;
-
-    border-bottom:1px solid rgba(255,255,255,.08);
-
-}
-
-.logo{
-
-    width:90px;
-    margin-bottom:15px;
-
-}
-
-.sidebar-header h4{
-
-    font-size:20px;
-    font-weight:600;
-
-}
-
-.sidebar-header small{
-
-    opacity:.7;
-
-}
-
-.menu{
-
-    list-style:none;
-
-    margin-top:20px;
-
-    padding:0;
-
-}
-
-.menu li{
-
-    margin:5px 15px;
-
-}
-
-.menu li a{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-    color:#fff;
-
-    text-decoration:none;
-
-    padding:14px 18px;
-
-    border-radius:12px;
-
-    transition:.3s;
-
-}
-
-.menu li a i{
-
-    width:22px;
-    text-align:center;
-
-}
-
-.menu li a:hover{
-
-    background:var(--hover);
-
-}
-
-.menu li.active a{
-
-    background:var(--primary);
-
-}
-
-/* ==========================
-CONTENT
-========================== */
-
-.main{
-
-    margin-left:260px;
-
-    padding:25px;
-
-}
-
-/* ==========================
-TOPBAR
-========================== */
-
-.topbar{
-
-    background:#fff;
-
-    border-radius:15px;
-
-    padding:15px 25px;
-
-    box-shadow:var(--shadow);
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:25px;
-
-}
-
-.title{
-
-    font-size:22px;
-
-    font-weight:600;
-
-}
-
-.user-info{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:20px;
-
-}
-
-.user-info span{
-
-    font-weight:500;
-
-}
-
-/* ==========================
-BUTTON MENU
-========================== */
-
-.btn-menu{
-
-    display:none;
-
-    border:none;
-
-    background:none;
-
-    font-size:22px;
-
-}
-
-/* ==========================
-CARD
-========================== */
-
-.card{
-
-    border:none;
-
-    border-radius:18px;
-
-    box-shadow:var(--shadow);
-
-}
-
-.card-header{
-
-    background:#fff;
-
-    font-weight:600;
-
-    border:none;
-
-    border-bottom:1px solid var(--border);
-
-}
-
-.card-body{
-
-    padding:25px;
-
-}
-
-/* ==========================
-CARD DASHBOARD
-========================== */
-
-.card-total{
-
-    border-left:5px solid var(--primary);
-
-}
-
-.card-masuk{
-
-    border-left:5px solid var(--success);
-
-}
-
-.card-keluar{
-
-    border-left:5px solid var(--danger);
-
-}
-
-.card-pending{
-
-    border-left:5px solid var(--warning);
-
-}
-
-.card-total .card-body,
-.card-masuk .card-body,
-.card-keluar .card-body,
-.card-pending .card-body{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
-.icon{
-
-    width:65px;
-
-    height:65px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    color:#fff;
-
-    font-size:25px;
-
-}
-
-.card-total .icon{
-
-    background:var(--primary);
-
-}
-
-.card-masuk .icon{
-
-    background:var(--success);
-
-}
-
-.card-keluar .icon{
-
-    background:var(--danger);
-
-}
-
-.card-pending .icon{
-
-    background:var(--warning);
-
-}
-
-.card h2{
-
-    margin:0;
-
-    font-size:28px;
-
-    font-weight:700;
-
-}
-
-.card p{
-
-    margin-bottom:8px;
-
-    color:#64748b;
-
-}/* ==========================================================
-   TABEL
-========================================================== */
-
-.table{
-
-    margin-bottom:0;
-
-    background:#fff;
-
-}
-
-.table thead{
-
-    background:#f8fafc;
-
-}
-
-.table thead th{
-
-    font-size:14px;
-
-    font-weight:600;
-
-    color:#475569;
-
-    border-bottom:2px solid var(--border);
-
-    white-space:nowrap;
-
-}
-
-.table tbody tr{
-
-    transition:.25s;
-
-}
-
-.table tbody tr:hover{
-
-    background:#f8fbff;
-
-    transform:scale(1.002);
-
-}
-
-.table td{
-
-    vertical-align:middle;
-
-    font-size:14px;
-
-}
-
-/* ==========================
-BADGE STATUS
-========================== */
-
-.badge{
-
-    padding:8px 12px;
-
-    font-size:12px;
-
-    border-radius:30px;
-
-    font-weight:600;
-
-}
-
-.badge-success{
-
-    background:#dcfce7;
-
-    color:#166534;
-
-}
-
-.badge-warning{
-
-    background:#fef3c7;
-
-    color:#92400e;
-
-}
-
-.badge-danger{
-
-    background:#fee2e2;
-
-    color:#991b1b;
-
-}
-
-/* ==========================
-BUTTON
-========================== */
-
-.btn{
-
-    border-radius:10px;
-
-    transition:.25s;
-
-    font-weight:500;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.btn-primary{
-
-    background:var(--primary);
-
-    border:none;
-
-}
-
-.btn-success{
-
-    border:none;
-
-}
-
-.btn-danger{
-
-    border:none;
-
-}
-
-.btn-secondary{
-
-    border:none;
-
-}
-
-/* ==========================
-FORM
-========================== */
-
-.form-control,
-.form-select{
-
-    border-radius:10px;
-
-    border:1px solid var(--border);
-
-    padding:10px 15px;
-
-}
-
-.form-control:focus,
-.form-select:focus{
-
-    box-shadow:none;
-
-    border-color:var(--primary);
-
-}
-
-/* ==========================
-MODAL
-========================== */
-
-.modal-content{
-
-    border:none;
-
-    border-radius:18px;
-
-}
-
-.modal-header{
-
-    border:none;
-
-}
-
-.modal-footer{
-
-    border:none;
-
-}
-
-/* ==========================
-FOOTER
-========================== */
-
-.footer{
-
-    margin-top:30px;
-
-    padding:20px;
-
-    text-align:center;
-
-    color:#64748b;
-
-    font-size:14px;
-
-}
-
-/* ==========================
-LOADING SCREEN
-========================== */
-
-#loadingScreen{
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(255,255,255,.9);
-
-    display:none;
-
-    justify-content:center;
-
-    align-items:center;
-
-    z-index:9999;
-
-}
-
-/* ==========================
-TOAST
-========================== */
-
-.toast{
-
-    border-radius:12px;
-
-    box-shadow:var(--shadow);
-
-}
-
-/* ==========================
-SEARCH
-========================== */
-
-#searchInput{
-
-    border-radius:30px;
-
-}
-
-/* ==========================
-SCROLLBAR
-========================== */
-
-::-webkit-scrollbar{
-
-    width:8px;
-
-    height:8px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#e2e8f0;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#94a3b8;
-
-    border-radius:20px;
-
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:#64748b;
-
-}
-
-/* ==========================
-HOVER EFFECT
-========================== */
-
-.card{
-
-    transition:.3s;
-
-}
-
-.card:hover{
-
-    transform:translateY(-5px);
-
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
-
-}/* ==========================================================
-   CHART
-========================================================== */
-
-canvas{
-
-    width:100% !important;
-
-    max-height:350px;
-
-}
-
-/* ==========================================================
-LOGIN MODAL
-========================================================== */
-
-#loginModal .modal-content{
-
-    border-radius:20px;
-
-}
-
-#loginModal img{
-
-    width:90px;
-
-}
-
-#loginModal h3{
-
-    font-weight:700;
-
-    color:var(--navy);
-
-}
-
-#loginModal .form-control{
-
-    height:48px;
-
-}
-
-/* ==========================================================
-DARK MODE
-========================================================== */
-
-body.dark{
-
-    background:#0f172a;
-
-    color:#e2e8f0;
-
-}
-
-body.dark .topbar{
-
-    background:#1e293b;
-
-    color:#fff;
-
-}
-
-body.dark .card{
-
-    background:#1e293b;
-
-    color:#fff;
-
-}
-
-body.dark .card-header{
-
-    background:#1e293b;
-
-    color:#fff;
-
-    border-bottom:1px solid #334155;
-
-}
-
-body.dark .table{
-
-    color:#fff;
-
-    background:#1e293b;
-
-}
-
-body.dark .table thead{
-
-    background:#334155;
-
-}
-
-body.dark .table td,
-body.dark .table th{
-
-    border-color:#334155;
-
-}
-
-body.dark .form-control,
-body.dark .form-select{
-
-    background:#334155;
-
-    color:#fff;
-
-    border-color:#475569;
-
-}
-
-body.dark .form-control::placeholder{
-
-    color:#cbd5e1;
-
-}
-
-body.dark .modal-content{
-
-    background:#1e293b;
-
-    color:#fff;
-
-}
-
-body.dark .footer{
-
-    color:#cbd5e1;
-
-}
-
-/* ==========================================================
-SIDEBAR COLLAPSE
-========================================================== */
-
-.sidebar.close{
-
-    width:80px;
-
-}
-
-.sidebar.close .sidebar-header h4,
-
-.sidebar.close .sidebar-header small,
-
-.sidebar.close .menu span{
-
-    display:none;
-
-}
-
-.sidebar.close + .main{
-
-    margin-left:80px;
-
-}
-
-/* ==========================================================
-NOTIFICATION
-========================================================== */
-
-.notification{
-
-    position:relative;
-
-}
-
-.notification::after{
-
-    content:"";
-
-    position:absolute;
-
-    width:10px;
-
-    height:10px;
-
-    border-radius:50%;
-
-    background:red;
-
-    right:-2px;
-
-    top:-2px;
-
-}
-
-/* ==========================================================
-EMPTY DATA
-========================================================== */
-
-.empty-state{
-
-    text-align:center;
-
-    padding:50px;
-
-    color:#94a3b8;
-
-}
-
-.empty-state i{
-
-    font-size:70px;
-
-    margin-bottom:20px;
-
-}
-
-/* ==========================================================
-ANIMATION
-========================================================== */
-
-.fade-up{
-
-    animation:fadeUp .5s ease;
-
-}
-
-@keyframes fadeUp{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(20px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
-}
-
-.zoom{
-
-    animation:zoom .3s;
-
-}
-
-@keyframes zoom{
-
-    from{
-
-        transform:scale(.95);
-
-        opacity:0;
-
-    }
-
-    to{
-
-        transform:scale(1);
-
-        opacity:1;
-
-    }
-
-}
-
-/* ==========================================================
-PRINT
-========================================================== */
-
-@media print{
-
-.sidebar,
-.topbar,
-.btn,
-.footer,
-#searchInput,
-#filterStatus{
-
-    display:none !important;
-
-}
-
-.main{
-
-    margin:0;
-
-    padding:0;
-
-}
-
-.card{
-
-    box-shadow:none;
-
-}
-
-}
-
-/* ==========================================================
-RESPONSIVE
-========================================================== */
-
-@media(max-width:992px){
-
-.sidebar{
-
-    left:-260px;
-
-}
-
-.sidebar.show{
-
-    left:0;
-
-}
-
-.main{
-
-    margin-left:0;
-
-}
-
-.btn-menu{
-
-    display:block;
-
-}
-
-.topbar{
-
-    padding:15px;
-
-}
-
-.title{
-
-    font-size:18px;
-
-}
-
-}
-
-@media(max-width:768px){
-
-.card-body{
-
-    padding:18px;
-
-}
-
-.card h2{
-
-    font-size:22px;
-
-}
-
-.icon{
-
-    width:55px;
-
-    height:55px;
-
-    font-size:22px;
-
-}
-
-.user-info span{
-
-    display:none;
-
-}
-
-.table{
-
-    font-size:13px;
-
-}
-
-}
-
-@media(max-width:576px){
-
-.sidebar{
-
-    width:240px;
-
-}
-
-.card{
-
-    margin-bottom:15px;
-
-}
-
-.topbar{
-
-    border-radius:12px;
-
-}
-
-.logo{
-
-    width:70px;
-
-}
-
-}
-
-/* ==========================================================
-UTILITY
-========================================================== */
-
-.shadow-soft{
-
-    box-shadow:var(--shadow);
-
-}
-
-.rounded-xl{
-
-    border-radius:18px;
-
-}
-
-.text-navy{
-
-    color:var(--navy);
-
-}
-
-.bg-navy{
-
-    background:var(--navy);
-
-    color:#fff;
-
-}
-
-.cursor{
-
-    cursor:pointer;
-
-}
-
-.transition{
-
-    transition:.3s;
-
-}/* ==========================================================
-   SISTEM MONITORING STOK BERAS
-   UPBU KELAS III BATOM
-   app.js
-========================================================== */
-
-/* ==========================
-LOCAL STORAGE KEY
-========================== */
-
-const STORAGE_KEY = "UPBU_BATOM_STOK";
-
-/* ==========================
-LOGIN
-========================== */
-
-const ACCOUNT = {
-    admin: {
-        username: "admin",
-        password: "admin123",
-        role: "ADMIN"
-    },
-    user: {
-        username: "user",
-        password: "user123",
-        role: "USER"
-    }
-};
-
-let currentUser = null;
-
-/* ==========================
-DATA
-========================== */
-
-let transaksi = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-/* ==========================
-CHART
-========================== */
-
-let barChart = null;
-let pieChart = null;
-
-/* ==========================
-ELEMENT
-========================== */
-
-const tableBody = document.getElementById("tableBody");
-
-const totalStok = document.getElementById("totalStok");
-const totalMasuk = document.getElementById("totalMasuk");
-const totalKeluar = document.getElementById("totalKeluar");
-const totalPending = document.getElementById("totalPending");
-
-/* ==========================
-INIT
-========================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    hideLoading();
-
-    showLogin();
-
-    renderDashboard();
-
-    renderTable();
-
-    renderChart();
-
-});
-
-/* ==========================
-LOGIN
-========================== */
-
-function showLogin(){
-
-    const modal =
-        new bootstrap.Modal(
-            document.getElementById("loginModal")
-        );
-
-    modal.show();
-
-}
-
-document
-.getElementById("btnLogin")
-.addEventListener("click", login);
-
-function login(){
-
-    const username =
-        document
-        .getElementById("username")
-        .value
-        .trim();
-
-    const password =
-        document
-        .getElementById("password")
-        .value
-        .trim();
-
-    if(
-        username===ACCOUNT.admin.username &&
-        password===ACCOUNT.admin.password
-    ){
-
-        currentUser = ACCOUNT.admin;
-
-    }
-
-    else if(
-
-        username===ACCOUNT.user.username &&
-        password===ACCOUNT.user.password
-
-    ){
-
-        currentUser = ACCOUNT.user;
-
-    }
-
-    else{
-
-        Swal.fire({
-
-            icon:"error",
-
-            title:"Login Gagal",
-
-            text:"Username atau Password salah"
-
-        });
-
-        return;
-
-    }
-
-    document
-    .getElementById("namaUser")
-    .innerHTML=currentUser.role;
-
-    bootstrap
-    .Modal
-    .getInstance(
-        document.getElementById("loginModal")
-    )
-    .hide();
-
-    toast("Login berhasil");
-
-}
-
-/* ==========================
-SAVE
-========================== */
-
-function saveData(){
-
-    localStorage.setItem(
-
-        STORAGE_KEY,
-
-        JSON.stringify(transaksi)
-
-    );
-
-}
-
-/* ==========================
-FORMAT DATE
-========================== */
-
-function today(){
-
-    return new Date().toLocaleDateString("id-ID",{
-
-        day:"2-digit",
-
-        month:"2-digit",
-
-        year:"numeric"
-
-    });
-
-}
-
-/* ==========================
-AUTO ID
-========================== */
-
-function generateID(){
-
-    return Date.now() +
-    Math.floor(Math.random()*1000);
-
-}
-
-/* ==========================
-COUNT
-========================== */
-
-function getTotalMasuk(){
-
-    return transaksi
-
-    .filter(x=>
-
-        x.jenis==="Masuk"
-
-        &&
-
-        x.status==="Disetujui"
-
-    )
-
-    .reduce(
-
-        (a,b)=>a+Number(b.jumlah),
-
-        0
-
-    );
-
-}
-
-function getTotalKeluar(){
-
-    return transaksi
-
-    .filter(x=>
-
-        x.jenis==="Keluar"
-
-        &&
-
-        x.status==="Disetujui"
-
-    )
-
-    .reduce(
-
-        (a,b)=>a+Number(b.jumlah),
-
-        0
-
-    );
-
-}
-
-function getPending(){
-
-    return transaksi
-
-    .filter(x=>
-
-        x.status==="Menunggu"
-
-    )
-
-    .length;
-
-}
-
-function getStock(){
-
-    return getTotalMasuk()-
-    getTotalKeluar();
-
-}
-
-/* ==========================
-DASHBOARD
-========================== */
-
-function renderDashboard(){
-
-    totalMasuk.innerHTML =
-        getTotalMasuk()+" Kg";
-
-    totalKeluar.innerHTML =
-        getTotalKeluar()+" Kg";
-
-    totalStok.innerHTML =
-        getStock()+" Kg";
-
-    totalPending.innerHTML =
-        getPending();
-
-}/* ==========================================================
-CRUD BERAS MASUK
-========================================================== */
-
-document
-.getElementById("btnSimpanMasuk")
-.addEventListener("click", tambahMasuk);
-
-function tambahMasuk(){
-
-    if(currentUser.role!=="ADMIN"){
-
-        Swal.fire({
-
-            icon:"warning",
-
-            title:"Akses Ditolak",
-
-            text:"Hanya ADMIN yang dapat menambah stok."
-
-        });
-
-        return;
-
-    }
-
-    const jumlah = Number(
-        document.getElementById("masukJumlah").value
-    );
-
-    const ket =
-        document
-        .getElementById("masukKeterangan")
-        .value
-        .trim();
-
-    if(jumlah<=0 || ket===""){
-
-        Swal.fire({
-
-            icon:"warning",
-
-            title:"Data belum lengkap"
-
-        });
-
-        return;
-
-    }
-
-    transaksi.push({
-
-        id:generateID(),
-
-        tanggal:today(),
-
-        jenis:"Masuk",
-
-        jumlah,
-
-        keterangan:ket,
-
-        status:"Disetujui"
-
-    });
-
-    saveData();
-
-    renderDashboard();
-
-    renderTable();
-
-    renderChart();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("modalMasuk")
-    ).hide();
-
-    document.getElementById("masukJumlah").value="";
-    document.getElementById("masukKeterangan").value="";
-
-    toast("Data berhasil ditambahkan");
-
-}
-
-/* ==========================================================
-PENGAJUAN BERAS KELUAR
-========================================================== */
-
-document
-.getElementById("btnSimpanKeluar")
-.addEventListener("click", tambahKeluar);
-
-function tambahKeluar(){
-
-    const jumlah = Number(
-        document.getElementById("keluarJumlah").value
-    );
-
-    const ket =
-        document
-        .getElementById("keluarKeterangan")
-        .value
-        .trim();
-
-    if(jumlah<=0 || ket===""){
-
-        Swal.fire({
-
-            icon:"warning",
-
-            title:"Data belum lengkap"
-
-        });
-
-        return;
-
-    }
-
-    if(jumlah>getStock()){
-
-        Swal.fire({
-
-            icon:"error",
-
-            title:"Stok tidak mencukupi"
-
-        });
-
-        return;
-
-    }
-
-    transaksi.push({
-
-        id:generateID(),
-
-        tanggal:today(),
-
-        jenis:"Keluar",
-
-        jumlah,
-
-        keterangan:ket,
-
-        status:"Menunggu"
-
-    });
-
-    saveData();
-
-    renderDashboard();
-
-    renderTable();
-
-    renderChart();
-
-    bootstrap.Modal.getInstance(
-        document.getElementById("modalKeluar")
-    ).hide();
-
-    document.getElementById("keluarJumlah").value="";
-    document.getElementById("keluarKeterangan").value="";
-
-    toast("Pengajuan berhasil dikirim");
-
-}
-
-/* ==========================================================
-APPROVE
-========================================================== */
-
-function approve(id){
-
-    if(currentUser.role!=="ADMIN") return;
-
-    const item =
-        transaksi.find(x=>x.id===id);
-
-    if(!item) return;
-
-    if(item.jenis==="Keluar" &&
-       item.jumlah>getStock()){
-
-        Swal.fire({
-
-            icon:"error",
-
-            title:"Stok tidak cukup"
-
-        });
-
-        return;
-
-    }
-
-    item.status="Disetujui";
-
-    saveData();
-
-    renderDashboard();
-
-    renderTable();
-
-    renderChart();
-
-    toast("Pengajuan disetujui");
-
-}
-
-/* ==========================================================
-REJECT
-========================================================== */
-
-function reject(id){
-
-    if(currentUser.role!=="ADMIN") return;
-
-    const item =
-        transaksi.find(x=>x.id===id);
-
-    if(!item) return;
-
-    item.status="Ditolak";
-
-    saveData();
-
-    renderDashboard();
-
-    renderTable();
-
-    renderChart();
-
-    toast("Pengajuan ditolak");
-
-}
-
-/* ==========================================================
-HAPUS
-========================================================== */
-
-function hapus(id){
-
-    Swal.fire({
-
-        title:"Hapus data?",
-
-        icon:"warning",
-
-        showCancelButton:true,
-
-        confirmButtonText:"Ya",
-
-        cancelButtonText:"Batal"
-
-    }).then(result=>{
-
-        if(!result.isConfirmed) return;
-
-        transaksi =
-            transaksi.filter(x=>x.id!==id);
-
-        saveData();
-
-        renderDashboard();
-
-        renderTable();
-
-        renderChart();
-
-        toast("Data berhasil dihapus");
-
-    });
-
-}/* ==========================================================
-   RENDER TABLE
-========================================================== */
-
-function renderTable() {
-
-    tableBody.innerHTML = "";
-
-    if (transaksi.length === 0) {
-
-        const tr = document.createElement("tr");
-
-        const td = document.createElement("td");
-
-        td.colSpan = 7;
-
-        td.className = "text-center text-muted py-4";
-
-        td.innerHTML = `
-            <i class="fa-solid fa-box-open fa-2x mb-2"></i>
-            <br>
-            Belum ada data transaksi
-        `;
-
-        tr.appendChild(td);
-
-        tableBody.appendChild(tr);
-
-        return;
-    }
-
-    transaksi
-        .slice()
-        .reverse()
-        .forEach((item, index) => {
-
-            const tr = document.createElement("tr");
-
-            // Nomor
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${item.tanggal}</td>
-                <td>${item.jenis}</td>
-                <td>${item.jumlah} Kg</td>
-                <td>${item.keterangan}</td>
-            `;
-
-            /* ================= STATUS ================= */
-
-            const tdStatus = document.createElement("td");
-
-            const badge = document.createElement("span");
-
-            if (item.status === "Disetujui") {
-
-                badge.className = "badge badge-success";
-
-            } else if (item.status === "Menunggu") {
-
-                badge.className = "badge badge-warning";
-
-            } else {
-
-                badge.className = "badge badge-danger";
-
-            }
-
-            badge.innerText = item.status;
-
-            tdStatus.appendChild(badge);
-
-            tr.appendChild(tdStatus);
-
-            /* ================= AKSI ================= */
-
-            const tdAksi = document.createElement("td");
-
-            if (currentUser && currentUser.role === "ADMIN") {
-
-                if (item.status === "Menunggu") {
-
-                    const approveBtn = document.createElement("button");
-
-                    approveBtn.className =
-                        "btn btn-success btn-sm me-1";
-
-                    approveBtn.innerHTML =
-                        '<i class="fa fa-check"></i>';
-
-                    approveBtn.onclick = () => approve(item.id);
-
-                    tdAksi.appendChild(approveBtn);
-
-                    const rejectBtn = document.createElement("button");
-
-                    rejectBtn.className =
-                        "btn btn-warning btn-sm me-1";
-
-                    rejectBtn.innerHTML =
-                        '<i class="fa fa-times"></i>';
-
-                    rejectBtn.onclick = () => reject(item.id);
-
-                    tdAksi.appendChild(rejectBtn);
-
-                }
-
-                const deleteBtn = document.createElement("button");
-
-                deleteBtn.className =
-                    "btn btn-danger btn-sm";
-
-                deleteBtn.innerHTML =
-                    '<i class="fa fa-trash"></i>';
-
-                deleteBtn.onclick = () => hapus(item.id);
-
-                tdAksi.appendChild(deleteBtn);
-
-            } else {
-
-                tdAksi.innerHTML = "-";
-
-            }
-
-            tr.appendChild(tdAksi);
-
-            tableBody.appendChild(tr);
-
-        });
-
-}
-
-/* ==========================================================
-SEARCH
-========================================================== */
-
-document
-.getElementById("searchInput")
-.addEventListener("keyup", function () {
-
-    const keyword = this.value.toLowerCase();
-
-    const rows = tableBody.querySelectorAll("tr");
-
-    rows.forEach(row => {
-
-        row.style.display =
-            row.innerText.toLowerCase().includes(keyword)
-                ? ""
-                : "none";
-
-    });
-
-});
-
-/* ==========================================================
-FILTER STATUS
-========================================================== */
-
-document
-.getElementById("filterStatus")
-.addEventListener("change", function () {
-
-    const value = this.value;
-
-    const rows = tableBody.querySelectorAll("tr");
-
-    rows.forEach(row => {
-
-        if (value === "") {
-
-            row.style.display = "";
-
+<!-- CORE LOGIC APPLICATION SCRIPT -->
+<script>
+    // Akun terdaftar baku
+    const ADMIN = { username: "admin", password: "beras123" };
+    const USER = { username: "user", password: "user123" };
+
+    // State Globals
+    let role = localStorage.getItem("role") || "";
+    let transaksi = JSON.parse(localStorage.getItem("transaksi")) || [];
+    let lineChart = null;
+    let pieChart = null;
+
+    // Instance Modal Bootstrap
+    const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+    const mainAppNode = document.getElementById("mainApp");
+
+    // Validasi Sesi Awal Saat Reload Halaman
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!localStorage.getItem("login")) {
+            mainAppNode.classList.add("d-none");
+            loginModal.show();
         } else {
-
-            row.style.display =
-                row.innerText.includes(value)
-                    ? ""
-                    : "none";
-
+            mainAppNode.classList.remove("d-none");
+            document.getElementById("namaRole").innerHTML = role;
+            refreshDashboard();
+            renderTable();
         }
 
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark");
+        }
     });
 
-});/* ==========================================================
-   CHART.JS
-========================================================== */
-
-function renderChart() {
-
-    const masuk = getTotalMasuk();
-    const keluar = getTotalKeluar();
-
-    /* ================= BAR ================= */
-
-    const barCanvas = document.getElementById("barChart");
-
-    if (barCanvas) {
-
-        if (barChart) barChart.destroy();
-
-        barChart = new Chart(barCanvas, {
-
-            type: "bar",
-
-            data: {
-
-                labels: ["Masuk", "Keluar"],
-
-                datasets: [{
-
-                    label: "Kilogram",
-
-                    data: [masuk, keluar],
-
-                    backgroundColor: [
-
-                        "#16a34a",
-
-                        "#dc2626"
-
-                    ],
-
-                    borderRadius: 8
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                plugins: {
-
-                    legend: {
-
-                        display: false
-
-                    }
-
-                }
-
-            }
-
-        });
-
-    }
-
-    /* ================= PIE ================= */
-
-    const pieCanvas = document.getElementById("pieChart");
-
-    if (pieCanvas) {
-
-        if (pieChart) pieChart.destroy();
-
-        pieChart = new Chart(pieCanvas, {
-
-            type: "pie",
-
-            data: {
-
-                labels: [
-
-                    "Masuk",
-
-                    "Keluar"
-
-                ],
-
-                datasets: [{
-
-                    data: [
-
-                        masuk,
-
-                        keluar
-
-                    ],
-
-                    backgroundColor: [
-
-                        "#16a34a",
-
-                        "#dc2626"
-
-                    ]
-
-                }]
-
-            }
-
-        });
-
-    }
-
-}
-
-/* ==========================================================
-DARK MODE
-========================================================== */
-
-const btnDark =
-document.getElementById("btnDark");
-
-btnDark.onclick = function () {
-
-    document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-
-        "dark",
-
-        document.body.classList.contains("dark")
-
-    );
-
-};
-
-if(localStorage.getItem("dark")=="true"){
-
-    document.body.classList.add("dark");
-
-}
-
-/* ==========================================================
-EXPORT EXCEL
-========================================================== */
-
-document
-.getElementById("btnExcel")
-.onclick = function(){
-
-    const ws =
-    XLSX.utils.json_to_sheet(transaksi);
-
-    const wb =
-    XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-
-        wb,
-
-        ws,
-
-        "Transaksi"
-
-    );
-
-    XLSX.writeFile(
-
-        wb,
-
-        "Laporan_Stok_Beras.xlsx"
-
-    );
-
-};
-
-/* ==========================================================
-PRINT / PDF
-========================================================== */
-
-document
-.getElementById("btnPrint")
-.onclick = function(){
-
-    window.print();
-
-};
-
-document
-.getElementById("btnPDF")
-.onclick = function(){
-
-    window.print();
-
-};
-
-/* ==========================================================
-BACKUP JSON
-========================================================== */
-
-function backupData(){
-
-    const blob = new Blob(
-
-        [
-
-            JSON.stringify(
-
-                transaksi,
-
-                null,
-
-                2
-
-            )
-
-        ],
-
-        {
-
-            type:"application/json"
-
-        }
-
-    );
-
-    const a =
-    document.createElement("a");
-
-    a.href =
-    URL.createObjectURL(blob);
-
-    a.download =
-    "backup_stok_beras.json";
-
-    a.click();
-
-}
-
-/* ==========================================================
-RESTORE JSON
-========================================================== */
-
-document
-.getElementById("restoreFile")
-.addEventListener(
-
-"change",
-
-function(){
-
-    const file=this.files[0];
-
-    if(!file) return;
-
-    const reader=new FileReader();
-
-    reader.onload=function(e){
-
-        transaksi=
-
-        JSON.parse(
-
-            e.target.result
-
-        );
-
-        saveData();
-
-        renderDashboard();
-
-        renderTable();
-
-        renderChart();
-
-        toast(
-
-            "Restore berhasil"
-
-        );
-
+    // Dark Mode Toggle
+    document.getElementById("btnDark").onclick = function(e) {
+        e.preventDefault();
+        document.body.classList.toggle("dark");
+        localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+        renderChart(); // Redraw untuk menyesuaikan warna canvas bila perlu
     };
 
-    reader.readAsText(file);
+    // Show/Hide Password Toggle
+    document.getElementById("showPassword").onclick = function() {
+        let passInput = document.getElementById("password");
+        if (passInput.type === "password") {
+            passInput.type = "text";
+            this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+        } else {
+            passInput.type = "password";
+            this.innerHTML = '<i class="fa fa-eye"></i>';
+        }
+    };
 
-});
+    // Event Trigger Login
+    document.getElementById("btnLogin").onclick = function() {
+        const u = document.getElementById("username").value.trim();
+        const p = document.getElementById("password").value.trim();
 
-/* ==========================================================
-TOAST
-========================================================== */
+        if (u === ADMIN.username && p === ADMIN.password) {
+            role = "ADMIN";
+        } else if (u === USER.username && p === USER.password) {
+            role = "USER";
+        } else {
+            Swal.fire({ icon: "error", title: "Akses Ditolak", text: "Kombinasi sandi / nama pengguna salah!" });
+            return;
+        }
 
-function toast(text){
+        localStorage.setItem("login", "true");
+        localStorage.setItem("role", role);
+        document.getElementById("namaRole").innerHTML = role;
+        
+        loginModal.hide();
+        mainAppNode.classList.remove("d-none");
 
-    const toastBody=
+        Swal.fire({ icon: "success", title: "Selamat Datang!", timer: 1200, showConfirmButton: false });
 
-    document.querySelector(
+        refreshDashboard();
+        renderTable();
+    };
 
-        ".toast-body"
+    // Logout Trigger
+    document.getElementById("btnLogout").onclick = function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Konfirmasi Keluar?",
+            text: "Sesi Anda saat ini akan dihentikan.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            confirmButtonText: "Ya, Keluar",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem("login");
+                localStorage.removeItem("role");
+                location.reload();
+            }
+        });
+    };
 
-    );
+    // Save state local
+    function simpanData() {
+        localStorage.setItem("transaksi", JSON.stringify(transaksi));
+    }
 
-    toastBody.innerHTML=text;
+    // Format Tanggal Sistem Indonesia
+    function formatTanggal() {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        return new Date().toLocaleString("id-ID", options).replace(/\./g, ':');
+    }
 
-    const toast=
+    // Hitung Total Real Stok Terkini
+    function hitungStok() {
+        let stok = 0;
+        transaksi.forEach(item => {
+            if (item.status === "Disetujui") {
+                if (item.jenis === "Masuk") stok += Number(item.jumlah);
+                else stok -= Number(item.jumlah);
+            }
+        });
+        return stok;
+    }
 
-    new bootstrap.Toast(
+    // Refresh Dashboard Angka Indikator
+    function refreshDashboard() {
+        let masuk = 0;
+        let keluar = 0;
+        let pending = 0;
 
-        document.getElementById(
+        transaksi.forEach(item => {
+            if (item.status === "Disetujui") {
+                if (item.jenis === "Masuk") masuk += Number(item.jumlah);
+                else keluar += Number(item.jumlah);
+            }
+            if (item.status === "Menunggu") pending++;
+        });
 
-            "liveToast"
+        document.getElementById("stokMasuk").innerHTML = masuk.toLocaleString("id-ID") + " Kg";
+        document.getElementById("stokKeluar").innerHTML = keluar.toLocaleString("id-ID") + " Kg";
+        document.getElementById("stokPending").innerHTML = pending;
+        document.getElementById("stokTotal").innerHTML = (masuk - keluar).toLocaleString("id-ID") + " Kg";
+        
+        // Selalu panggil grafik setiap pembaruan data internal
+        renderChart();
+    }
 
-        )
+    // ID Generator Unik Unix-timestamp
+    function generateID() {
+        return Date.now() + Math.floor(Math.random() * 1000);
+    }
 
-    );
+    /* ==========================================================
+       CRUD LOGIC OPERATOR
+       ========================================================== */
 
-    toast.show();
+    // INPUT BERAS MASUK
+    document.getElementById("simpanMasuk").onclick = function () {
+        if (role !== "ADMIN") {
+            Swal.fire({ icon: "error", title: "Hak Akses Terbatas", text: "Hanya Admin yang diizinkan memvalidasi barang masuk." });
+            return;
+        }
 
-}
+        const jumlah = Number(document.getElementById("jumlahMasuk").value);
+        const ket = document.getElementById("ketMasuk").value.trim();
 
-/* ==========================================================
-LOADING
-========================================================== */
+        if (jumlah <= 0 || ket === "") {
+            Swal.fire({ icon: "warning", title: "Form Kosong", text: "Mohon input jumlah logistik valid & keterangan asal." });
+            return;
+        }
 
-function hideLoading(){
+        transaksi.push({
+            id: generateID(),
+            tanggal: formatTanggal(),
+            jenis: "Masuk",
+            jumlah: jumlah,
+            keterangan: ket,
+            status: "Disetujui"
+        });
 
-    setTimeout(()=>{
+        simpanData();
+        refreshDashboard();
+        renderTable();
 
-        document
-        .getElementById(
-            "loadingScreen"
-        )
-        .style.display="none";
+        bootstrap.Modal.getInstance(document.getElementById("modalMasuk")).hide();
+        document.getElementById("jumlahMasuk").value = "";
+        document.getElementById("ketMasuk").value = "";
 
-    },700);
+        Swal.fire({ icon: "success", title: "Sukses", text: "Stok beras berhasil ditambahkan ke sistem gudang." });
+    };
 
-}
+    // PENGAJUAN BERAS KELUAR
+    document.getElementById("simpanKeluar").onclick = function () {
+        const jumlah = Number(document.getElementById("jumlahKeluar").value);
+        const ket = document.getElementById("ketKeluar").value.trim();
 
-/* ==========================================================
-LOGOUT
-========================================================== */
+        if (jumlah <= 0 || ket === "") {
+            Swal.fire({ icon: "warning", title: "Form Kosong", text: "Mohon input jumlah logistik valid & keterangan tujuan." });
+            return;
+        }
 
-document
-.getElementById("btnLogout")
-.onclick=function(){
+        if (jumlah > hitungStok()) {
+            Swal.fire({ icon: "error", title: "Over-Capacity", text: "Permintaan gagal, stok gudang saat ini tidak memadai." });
+            return;
+        }
 
-Swal.fire({
+        // Siapapun bisa mengajukan, berstatus 'Menunggu'
+        transaksi.push({
+            id: generateID(),
+            tanggal: formatTanggal(),
+            jenis: "Keluar",
+            jumlah: jumlah,
+            keterangan: ket,
+            status: "Menunggu"
+        });
 
-title:"Logout?",
+        simpanData();
+        refreshDashboard();
+        renderTable();
 
-icon:"question",
+        bootstrap.Modal.getInstance(document.getElementById("modalKeluar")).hide();
+        document.getElementById("jumlahKeluar").value = "";
+        document.getElementById("ketKeluar").value = "";
 
-showCancelButton:true
+        Swal.fire({ icon: "success", title: "Pengajuan Terkirim", text: "Permohonan keluar barang berhasil diajukan & menunggu verifikasi Admin." });
+    };
 
-}).then(r=>{
+    // APPROVAL SYSTEM (ADMIN ONLY)
+    function approve(id) {
+        let item = transaksi.find(x => x.id == id);
+        if (!item) return;
 
-if(!r.isConfirmed) return;
+        if (item.jenis === "Keluar" && item.jumlah > hitungStok()) {
+            Swal.fire({ icon: "error", title: "Gagal Validasi", text: "Stok barang di gudang sudah berkurang atau tidak mencukupi." });
+            return;
+        }
 
-location.reload();
+        item.status = "Disetujui";
+        simpanData();
+        refreshDashboard();
+        renderTable();
+        Swal.fire({ icon: "success", title: "Disetujui", text: "Dokumen pengeluaran logistik telah divalidasi.", timer: 1000, showConfirmButton: false });
+    }
 
-});
+    // REJECT SYSTEM (ADMIN ONLY)
+    function reject(id) {
+        let item = transaksi.find(x => x.id == id);
+        if (!item) return;
 
-};
+        item.status = "Ditolak";
+        simpanData();
+        refreshDashboard();
+        renderTable();
+        Swal.fire({ icon: "info", title: "Ditolak", text: "Pengajuan pengeluaran barang resmi ditolak.", timer: 1000, showConfirmButton: false });
+    }
 
-/* ==========================================================
-SIDEBAR MOBILE
-========================================================== */
+    // REMOVE SYSTEM (ADMIN ONLY)
+    function hapus(id) {
+        Swal.fire({
+            title: "Hapus Permanen Data?",
+            text: "Tindakan ini akan memengaruhi total logaritma stok saat ini.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            confirmButtonText: "Ya, Hapus Data",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                transaksi = transaksi.filter(x => x.id != id);
+                simpanData();
+                refreshDashboard();
+                renderTable();
+                Swal.fire({ icon: "success", title: "Terhapus", text: "Data terpilih berhasil dibersihkan dari database lokal.", timer: 1000, showConfirmButton: false });
+            }
+        });
+    }
 
-const sidebar=document.querySelector(".sidebar");
+    /* ==========================================================
+       RENDER TABLE & COMPLEX FILTERING ADVANCED
+       ========================================================== */
+    function renderTable() {
+        const tbody = document.getElementById("tabelData");
+        tbody.innerHTML = "";
 
-const menu=document.querySelector(".btn-menu");
+        const searchKeyword = document.getElementById("searchData").value.toLowerCase();
+        const statusFilter = document.getElementById("filterStatus").value;
+        const dateFilter = document.getElementById("filterTanggal").value; // Format yyyy-mm-dd
 
-menu.onclick=function(){
+        // Lakukan filter array objek demi integritas pencarian data global
+        let filteredData = transaksi.filter(item => {
+            let matchSearch = item.keterangan.toLowerCase().includes(searchKeyword) || item.jenis.toLowerCase().includes(searchKeyword);
+            let matchStatus = statusFilter === "" || item.status === statusFilter;
+            
+            // Konversi kecocokan tanggal bawaan lokal string
+            let matchDate = true;
+            if (dateFilter) {
+                // dateFilter = "2026-07-18", item.tanggal biasanya "18/07/2026..."
+                const parts = dateFilter.split("-"); // [yyyy, mm, dd]
+                const formattedLocaleDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                matchDate = item.tanggal.includes(formattedLocaleDate);
+            }
 
-sidebar.classList.toggle("show");
+            return matchSearch && matchStatus && matchDate;
+        });
 
-};
+        document.getElementById("jumlahData").innerHTML = filteredData.length + " Data Terfilter";
 
-/* ==========================================================
-INIT
-========================================================== */
+        if(filteredData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada kecocokan log transaksi ditemukan.</td></tr>`;
+            return;
+        }
 
-renderDashboard();
+        // Render balik dari yang terbaru (Reverse chronology)
+        filteredData.slice().reverse().forEach((item, index) => {
+            let badge = "";
+            if (item.status === "Disetujui") badge = '<span class="badge bg-success"><i class="fa fa-circle-check me-1"></i>Disetujui</span>';
+            else if (item.status === "Menunggu") badge = '<span class="badge bg-warning text-dark"><i class="fa fa-spinner fa-spin me-1"></i>Menunggu</span>';
+            else if (item.status === "Ditolak") badge = '<span class="badge bg-danger"><i class="fa fa-circle-xmark me-1"></i>Ditolak</span>';
 
-renderTable();
+            let jenisBadge = item.jenis === "Masuk" ? 
+                '<span class="text-success fw-bold"><i class="fa fa-circle-arrow-down me-1"></i>Masuk</span>' : 
+                '<span class="text-danger fw-bold"><i class="fa fa-circle-arrow-up me-1"></i>Keluar</span>';
 
-renderChart();
+            let aksi = "";
+            if (role === "ADMIN") {
+                if (item.status === "Menunggu") {
+                    aksi += `<button class="btn btn-success btn-sm me-1 mb-1" onclick="approve(${item.id})" title="Setujui"><i class="fa fa-check"></i></button>`;
+                    aksi += `<button class="btn btn-warning btn-sm me-1 mb-1" onclick="reject(${item.id})" title="Tolak"><i class="fa fa-xmark"></i></button>`;
+                }
+                aksi += `<button class="btn btn-danger btn-sm mb-1" onclick="hapus(${item.id})" title="Hapus"><i class="fa fa-trash"></i></button>`;
+            } else {
+                aksi = `<span class="text-muted small"><i class="fa fa-lock me-1"></i>Read Only</span>`;
+            }
 
-console.log(
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${index + 1}</strong></td>
+                    <td><i class="fa fa-calendar-alt text-secondary me-2"></i>${item.tanggal}</td>
+                    <td>${jenisBadge}</td>
+                    <td class="fw-semibold">${item.jumlah.toLocaleString("id-ID")} Kg</td>
+                    <td>${item.keterangan}</td>
+                    <td>${badge}</td>
+                    <td class="text-center">${aksi}</td>
+                </tr>
+            `;
+        });
+    }
 
-"Monitoring Stok Beras v2.0 Ready"
+    // Filter Live Bindings
+    document.getElementById("searchData").addEventListener("keyup", renderTable);
+    document.getElementById("filterStatus").addEventListener("change", renderTable);
+    document.getElementById("filterTanggal").addEventListener("change", renderTable);
+    
+    // Reset Button Filter
+    document.getElementById("btnResetFilter").onclick = function() {
+        document.getElementById("searchData").value = "";
+        document.getElementById("filterStatus").value = "";
+        document.getElementById("filterTanggal").value = "";
+        renderTable();
+        Swal.fire({ icon: "success", title: "Filter Direset", timer: 700, showConfirmButton: false });
+    };
 
-);
+    /* ==========================================================
+       CHART JS VISUALIZATION BUILDER
+       ========================================================== */
+    function renderChart() {
+        const ctx1 = document.getElementById("chartStok");
+        const ctx2 = document.getElementById("pieChart");
+
+        let totalBerasMasuk = 0;
+        let totalBerasKeluar = 0;
+        let frekuensiMasuk = 0;
+        let frekuensiKeluar = 0;
+
+        transaksi.forEach(item => {
+            if (item.status === "Disetujui") {
+                if (item.jenis === "Masuk") totalBerasMasuk += Number(item.jumlah);
+                else totalBerasKeluar += Number(item.jumlah);
+            }
+            if (item.jenis === "Masuk") frekuensiMasuk++;
+            else frekuensiKeluar++;
+        });
+
+        // 1. Render Bar Chart (Volume Akumulasi)
+        if (ctx1) {
+            if (lineChart) lineChart.destroy();
+            lineChart = new Chart(ctx1, {
+                type: "bar",
+                data: {
+                    labels: ["Total Masuk (Kg)", "Total Keluar (Kg)"],
+                    datasets: [{
+                        label: "Volume Massa Beras",
+                        data: [totalBerasMasuk, totalBerasKeluar],
+                        backgroundColor: ["rgba(25, 135, 84, 0.75)", "rgba(220, 53, 69, 0.75)"],
+                        borderColor: ["#198754", "#dc3545"],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // 2. Render Pie Chart (Rasio Aktivitas Frekuensi Transaksi)
+        if (ctx2) {
+            if (pieChart) pieChart.destroy();
+            pieChart = new Chart(ctx2, {
+                type: "pie",
+                data: {
+                    labels: ["Frekuensi Masuk", "Frekuensi Keluar"],
+                    datasets: [{
+                        data: [frekuensiMasuk, frekuensiKeluar],
+                        backgroundColor: ["#0d6efd", "#ffc107"],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+    }
+
+    /* ==========================================================
+       IMPORT / EXPORT CORE OPERATIONS
+       ========================================================== */
+
+    // Export Excel via SheetJS
+    document.getElementById("btnExportExcel").onclick = function () {
+        if(transaksi.length === 0){
+            Swal.fire({ icon: "warning", title: "Gagal Ekspor", text: "Tidak ditemukan data log transaksi untuk diekspor." });
+            return;
+        }
+        const ws = XLSX.utils.json_to_sheet(transaksi);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Log Logistik Beras");
+        XLSX.writeFile(wb, "Laporan_Stok_Beras_" + Date.now() + ".xlsx");
+    };
+
+    // Print / Save as PDF Native Web Layer
+    document.getElementById("btnExportPDF").onclick = function () {
+        window.print();
+    };
+
+    // Backup JSON System
+    document.getElementById("btnBackup").onclick = function () {
+        if(transaksi.length === 0){
+            Swal.fire({ icon: "warning", title: "Gagal Backup", text: "Database kosong. Tidak ada data untuk dibackup." });
+            return;
+        }
+        const blob = new Blob([JSON.stringify(transaksi, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `BACKUP_DATABASE_BERAS_${Date.now()}.json`;
+        a.click();
+    };
+
+    // Restore JSON Database System
+    function restoreJSON(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (Array.isArray(importedData)) {
+                    transaksi = importedData;
+                    simpanData();
+                    refreshDashboard();
+                    renderTable();
+                    Swal.fire({ icon: "success", title: "Sinkronisasi Berhasil", text: "Database logistik sukses dipulihkan ke versi cadangan." });
+                } else {
+                    throw new Error("Format skema JSON tidak valid.");
+                }
+            } catch (err) {
+                Swal.fire({ icon: "error", title: "Gagal Membaca File", text: "Pastikan format file enkripsi cadangan JSON Anda benar." });
+            }
+        };
+        reader.readAsText(file);
+        document.getElementById("btnRestore").value = ""; // clear input stream
+    }
+</script>
+
+</body>
+</html>
